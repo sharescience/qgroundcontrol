@@ -68,8 +68,14 @@
      <string>Widgets</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menusharescience">
+    <property name="title">
+     <string>sharescience</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuWidgets"/>
+   <addaction name="menusharescience"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionExit">
