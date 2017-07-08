@@ -370,7 +370,7 @@ QGCView {
             anchors.right:      _flightVideo.right
             height:             ScreenTools.defaultFontPixelHeight * 2
             width:              height
-            visible:            QGroundControl.videoManager.videoRunning && QGroundControl.settingsManager.videoSettings.showRecControl.rawValue
+            visible:            QGroundControl.videoManager.videoReceiver.videoRunning && QGroundControl.settingsManager.videoSettings.showRecControl.rawValue
             opacity:            0.75
 
             Rectangle {
@@ -540,6 +540,7 @@ QGCView {
             id:                 guidedActionsController
             missionController:  _missionController
             confirmDialog:      guidedActionConfirm
+            actionList:         guidedActionList
             altitudeSlider:     _altitudeSlider
             z:                  _flightVideoPipControl.z + 1
 
