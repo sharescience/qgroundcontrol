@@ -427,13 +427,13 @@ bool MainWindow::_createInnerDockWidget(const QString& widgetName)
                 widget = new Linecharts(widgetName, action, _mavLinkDecoderInstance(), this);
                 break;
             case ANALYZE1:
-                widget = new Linecharts(widgetName, action, mavlinkDecoder, this);
+                widget = new Linecharts(widgetName, action, _mavLinkDecoderInstance(), this);
                 break;
             case ANALYZE2:
-                widget = new Linecharts(widgetName, action, mavlinkDecoder, this);
+                widget = new Linecharts(widgetName, action, _mavLinkDecoderInstance(), this);
                 break;
             case ANALYZE3:
-                widget = new Linecharts(widgetName, action, mavlinkDecoder, this);
+                widget = new Linecharts(widgetName, action, _mavLinkDecoderInstance(), this);
                 break;
         }
         if(widget) {

@@ -2162,9 +2162,9 @@ QGCView {
                 editable: true
                 model: ListModel {
                     id: modelServo1TestPercent
-                    ListElement { text: "-100" }
-                    ListElement { text: "0" }
-                    ListElement { text: "100" }
+                    ListElement { text: "10" }
+                    ListElement { text: "15" }
+                    ListElement { text: "20" }
                 }
                 onAccepted: {
                     if(_comboboxServo1Test.find(currentText) === -1){
@@ -2228,9 +2228,9 @@ QGCView {
                 editable: true
                 model: ListModel {
                     id: modelServo2TestPercent
-                    ListElement { text: "-100" }
-                    ListElement { text: "0" }
-                    ListElement { text: "100" }
+                    ListElement { text: "10" }
+                    ListElement { text: "15" }
+                    ListElement { text: "20" }
                 }
                 onAccepted: {
                     if(_comboboxServo2Test.find(currentText) === -1){
@@ -2294,9 +2294,9 @@ QGCView {
                 editable: true
                 model: ListModel {
                     id: modelServo3TestPercent
-                    ListElement { text: "-100" }
-                    ListElement { text: "0" }
-                    ListElement { text: "100" }
+                    ListElement { text: "10" }
+                    ListElement { text: "15" }
+                    ListElement { text: "20" }
                 }
                 onAccepted: {
                     if(_comboboxServo3Test.find(currentText) === -1){
@@ -2338,7 +2338,7 @@ QGCView {
                 }
             }
 
-            /* ----- Servo tail -----*/
+            /* ----- Servo #4 -----*/
             CheckBox{
                 anchors.top       : _checkboxServo3Test.bottom
                 anchors.left      : _checkboxServo3Test.left
@@ -2347,7 +2347,7 @@ QGCView {
                 id: _checkboxServoTailTest
                 width : _Width
                 height: _Height
-                text:qsTr("Servo tail")
+                text:qsTr("Servo #4")
             }
             ComboBox{
                 anchors.verticalCenter: _checkboxServoTailTest.verticalCenter
@@ -2360,9 +2360,9 @@ QGCView {
                 editable: true
                 model: ListModel {
                     id: modelServoTailTestPercent
-                    ListElement { text: "-100" }
-                    ListElement { text: "0" }
-                    ListElement { text: "100" }
+                    ListElement { text: "10" }
+                    ListElement { text: "15" }
+                    ListElement { text: "20" }
                 }
                 onAccepted: {
                     if(_comboboxServoTailTest.find(currentText) === -1){
@@ -2400,71 +2400,6 @@ QGCView {
                         controller.stopServoTest()
                     }else{
                         controller.startServoTest(4)
-                    }
-                }
-            }
-
-            /* ----- Main Rotor -----*/
-            CheckBox{
-                anchors.top       : _checkboxServoTailTest.bottom
-                anchors.left      : _checkboxServoTailTest.left
-                anchors.topMargin : _margins
-
-                id: _checkboxMainRotorTest
-                width : _Width
-                height: _Height
-                text:qsTr("Main Rot")
-            }
-            ComboBox{
-                anchors.verticalCenter: _checkboxMainRotorTest.verticalCenter
-                anchors.left          : _checkboxMainRotorTest.right
-                anchors.leftMargin    : _margins
-
-                id   : _comboboxMainRotorTest
-                width: _Width
-                height: _Height
-                editable: true
-                model: ListModel {
-                    id: modelMainRotorTestPercent
-                    ListElement { text: "0" }
-                    ListElement { text: "100" }
-                }
-                onAccepted: {
-                    if(_comboboxMainRotorTest.find(currentText) === -1){
-                        modelMainRotorTestPercent.append({text: editText})
-                        currentIndex = _comboboxMainRotorTest.find(editText)
-                        controller.mainRotorTestPercent(_comboboxMainRotorTest.currentText)
-                    }
-                }
-                onCurrentTextChanged: {
-                    controller.mainRotorTestPercent(_comboboxMainRotorTest.currentText)
-                }
-            }
-            Label{
-                anchors.verticalCenter: _comboboxMainRotorTest.verticalCenter
-                anchors.left          : _comboboxMainRotorTest.right
-                anchors.leftMargin    : _comboboxMainRotorTest
-
-                id    : _labelMainRotorTestUnit
-                height: _Height
-
-                verticalAlignment: Text.AlignVCenter
-                text: qsTr("%")
-            }
-            Button{
-                anchors.top       : _labelMainRotorTestUnit.top
-                anchors.left      : _labelMainRotorTestUnit.right
-                anchors.leftMargin: _margins
-
-                id: _buttonMainRotorTestStart
-                width : _Width
-                height: _Height
-                text  : qsTr("Start")
-                onClicked:{
-                    if(_checkboxMainRotorTest.checked === false){
-                        controller.stopServoTest()
-                    }else{
-                        controller.startServoTest(5)
                     }
                 }
             }
