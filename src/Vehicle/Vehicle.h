@@ -774,6 +774,20 @@ signals:
     // Mavlink Serial Data
     void mavlinkSerialControl(uint8_t device, uint8_t flags, uint16_t timeout, uint32_t baudrate, QByteArray data);
 
+#ifndef __mobile__
+    /// For evaluating communication quality
+    void mavlinkElasticity(mavlink_message_t message);
+
+    /// For RC_CHANNELS
+    void mavlinkRCChannels(mavlink_message_t message);
+
+    /// For RC_CHANNELS_RAW
+    void mavlinkRCChannelsRaw(mavlink_message_t message);
+
+    /// For SERVO_OUTPUT_RAW
+    void mavlinkServoOutputRaw(mavlink_message_t message);
+#endif
+
 private slots:
     void _mavlinkMessageReceived(LinkInterface* link, mavlink_message_t message);
     void _linkInactiveOrDeleted(LinkInterface* link);

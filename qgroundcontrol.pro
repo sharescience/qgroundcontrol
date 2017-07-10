@@ -598,6 +598,10 @@ HEADERS += \
 
 !MobileBuild {
 HEADERS += \
+    src/ViewWidgets/PID.h\
+    src/ViewWidgets/PIDController.h\
+    src/ViewWidgets/MavlinkTest.h \
+    src/ViewWidgets/MavlinkTestController.h \
     src/AnalyzeView/GeoTagController.h \
     src/AnalyzeView/MavlinkConsoleController.h \
     src/GPS/Drivers/src/gps_helper.h \
@@ -761,6 +765,10 @@ contains(DEFINES, QGC_ENABLE_BLUETOOTH) {
 
 !MobileBuild {
 SOURCES += \
+    src/ViewWidgets/PID.cc\
+    src/ViewWidgets/PIDController.cc\
+    src/ViewWidgets/MavlinkTest.cc \
+    src/ViewWidgets/MavlinkTestController.cc \
     src/AnalyzeView/GeoTagController.cc \
     src/AnalyzeView/MavlinkConsoleController.cc \
     src/GPS/Drivers/src/gps_helper.cpp \

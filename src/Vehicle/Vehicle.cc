@@ -522,9 +522,15 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         break;
     case MAVLINK_MSG_ID_RC_CHANNELS:
         _handleRCChannels(message);
+#ifndef __mobile__
+        emit mavlinkRCChannels(message);
+#endif
         break;
     case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
         _handleRCChannelsRaw(message);
+#ifndef __mobile__
+        emit mavlinkRCChannelsRaw(message);
+#endif
         break;
     case MAVLINK_MSG_ID_BATTERY_STATUS:
         _handleBatteryStatus(message);
@@ -609,6 +615,14 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     case MAVLINK_MSG_ID_WIND:
         _handleWind(message);
         break;
+#ifndef __mobile__
+    case MAVLINK_MSG_ID_ELASTICITY:
+        emit mavlinkElasticity(message);
+        break;
+    case MAVLINK_MSG_ID_SERVO_OUTPUT_RAW:
+        emit mavlinkServoOutputRaw(message);
+        break;
+#endif
     }
 
     emit mavlinkMessageReceived(message);
@@ -1230,7 +1244,9 @@ void Vehicle::_sendMessageOnLink(LinkInterface* link, mavlink_message_t message)
     if (!link || !_links.contains(link) || !link->isConnected()) {
         return;
     }
-
+#ifndef __mobile__
+    _uas->sendMessage(message);
+#endif
 #if 0
     // Leaving in for ease in Mav 2.0 testing
     mavlink_status_t* mavlinkStatus = mavlink_get_channel_status(link->mavlinkChannel());

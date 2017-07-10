@@ -311,6 +311,8 @@ public slots:
     /** @brief Set the values for the 6dof manual control of the vehicle */
 #ifndef __mobile__
     void setManual6DOFControlCommands(double x, double y, double z, double roll, double pitch, double yaw);
+    /** @brief Send a message to one of the communication links. */
+    virtual void sendMessage(mavlink_message_t message);
 #endif
 
     /** @brief Receive a message from one of the communication links. */
@@ -363,7 +365,9 @@ protected:
 
 private:
     void _say(const QString& text, int severity = 6);
-
+#ifndef __mobile__
+    void _splice_message(mavlink_message_t message, QString &msg);
+#endif
 private:
     Vehicle*                _vehicle;
     FirmwarePluginManager*  _firmwarePluginManager;

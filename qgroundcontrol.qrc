@@ -14,6 +14,8 @@
         <file alias="JoystickIndicator.qml">src/ui/toolbar/JoystickIndicator.qml</file>
     </qresource>
     <qresource prefix="/qml">
+        <file alias="MavlinkTest.qml">src/ViewWidgets/MavlinkTest.qml</file>
+        <file alias="PID.qml">src/ViewWidgets/PID.qml</file>
         <file alias="AirframeComponent.qml">src/AutoPilotPlugins/PX4/AirframeComponent.qml</file>
         <file alias="AirframeComponentSummary.qml">src/AutoPilotPlugins/PX4/AirframeComponentSummary.qml</file>
         <file alias="AnalyzeView.qml">src/AnalyzeView/AnalyzeView.qml</file>

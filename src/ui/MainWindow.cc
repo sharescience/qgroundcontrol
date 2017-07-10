@@ -49,6 +49,8 @@
 #include "QGCDockWidget.h"
 #include "HILDockWidget.h"
 #include "AppMessages.h"
+#include "MavlinkTest.h"
+#include "PID.h"
 #endif
 
 #ifndef NO_SERIAL_LINK
@@ -69,7 +71,15 @@ enum DockWidgetTypes {
     ONBOARD_FILES,
     DEPRECATED_WIDGET,
     HIL_CONFIG,
-    ANALYZE
+    ANALYZE,
+    ANALYZE1,
+    ANALYZE2,
+    ANALYZE3
+};
+
+enum sharescienceDockWidgetTypes {
+    MAVLINK_TEST,
+    PID_TUNING
 };
 
 static const char *rgDockWidgetNames[] = {
@@ -78,7 +88,15 @@ static const char *rgDockWidgetNames[] = {
     "Onboard Files",
     "Deprecated Widget",
     "HIL Config",
-    "Analyze"
+    "Analyze",
+    "Analyze1",
+    "Analyze2",
+    "Analyze3"
+};
+
+static const char *sharescienceDockWidgetNames[] = {
+    "MAVLink Test",
+    "PID Tuning"
 };
 
 #define ARRAY_SIZE(ARRAY) (sizeof(ARRAY) / sizeof(ARRAY[0]))
@@ -328,6 +346,18 @@ void MainWindow::_buildCommonWidgets(void)
         _ui.menuWidgets->addAction(action);
         _mapName2Action[pDockWidgetName] = action;
     }
+    for (int i = 0, end = ARRAY_SIZE(sharescienceDockWidgetNames); i < end; i++) {
+
+        const char* pDockWidgetName = sharescienceDockWidgetNames[i];
+
+        // Add to menu
+        QAction* action = new QAction(pDockWidgetName, this);
+        action->setCheckable(true);
+        action->setData(i);
+        connect(action, &QAction::triggered, this, &MainWindow::_showsharescienceDocWidgetAction);
+        _ui.menusharescience->addAction(action);
+        _sharesciencemapName2Action[pDockWidgetName] = action;
+    }
 }
 
 /// Shows or hides the specified dock widget, creating if necessary
@@ -353,6 +383,24 @@ void MainWindow::_showDockWidget(const QString& name, bool show)
     _mapName2Action[name]->setChecked(show);
 }
 
+/// Shows or hides the specified dock widget(sharescience), creating if necessary
+void MainWindow::_showsharescienceDockWidget(const QString& name, bool show)
+{
+    // Create the inner widget if we need to
+    if (!_mapName2sharescienceDockWidget.contains(name)) {
+        if(!_sharesciencecreateInnerDockWidget(name)) {
+            qWarning() << "Trying to load non existent widget:" << name;
+            return;
+        }
+    }
+    Q_ASSERT(_mapName2sharescienceDockWidget.contains(name));
+    QGCDockWidget* dockWidget = _mapName2sharescienceDockWidget[name];
+    Q_ASSERT(dockWidget);
+    dockWidget->setVisible(show);
+    Q_ASSERT(_sharesciencemapName2Action.contains(name));
+    _sharesciencemapName2Action[name]->setChecked(show);
+}
+
 /// Creates the specified inner dock widget and adds to the QDockWidget
 bool MainWindow::_createInnerDockWidget(const QString& widgetName)
 {
@@ -375,9 +423,39 @@ bool MainWindow::_createInnerDockWidget(const QString& widgetName)
             case ANALYZE:
                 widget = new Linecharts(widgetName, action, _mavLinkDecoderInstance(), this);
                 break;
+            case ANALYZE1:
+                widget = new Linecharts(widgetName, action, _mavLinkDecoderInstance(), this);
+                break;
+            case ANALYZE2:
+                widget = new Linecharts(widgetName, action, _mavLinkDecoderInstance(), this);
+                break;
+            case ANALYZE3:
+                widget = new Linecharts(widgetName, action, _mavLinkDecoderInstance(), this);
+                break;
         }
         if(widget) {
             _mapName2DockWidget[widgetName] = widget;
+        }
+    }
+    return widget != NULL;
+}
+
+/// Creates the sharescience inner dock widget and adds to the QDockWidget
+bool MainWindow::_sharesciencecreateInnerDockWidget(const QString& widgetName)
+{
+    QGCDockWidget* widget = NULL;
+    QAction *action = _sharesciencemapName2Action[widgetName];
+    if(action) {
+        switch(action->data().toInt()) {
+            case MAVLINK_TEST:
+                widget = new MavlinkTest(widgetName, action, this);
+                break;
+            case PID_TUNING:
+                widget = new PID(widgetName, action, this);
+                break;
+        }
+        if(widget) {
+            _mapName2sharescienceDockWidget[widgetName] = widget;
         }
     }
     return widget != NULL;
@@ -388,6 +466,9 @@ void MainWindow::_hideAllDockWidgets(void)
     foreach(QGCDockWidget* dockWidget, _mapName2DockWidget) {
         dockWidget->setVisible(false);
     }
+    foreach(QGCDockWidget* dockWidget, _mapName2sharescienceDockWidget) {
+        dockWidget->setVisible(false);
+    }
 }
 
 void MainWindow::_showDockWidgetAction(bool show)
@@ -395,6 +476,13 @@ void MainWindow::_showDockWidgetAction(bool show)
     QAction* action = qobject_cast<QAction*>(QObject::sender());
     Q_ASSERT(action);
     _showDockWidget(rgDockWidgetNames[action->data().toInt()], show);
+}
+
+void MainWindow::_showsharescienceDocWidgetAction(bool show)
+{
+    QAction* action = qobject_cast<QAction*>(QObject::sender());
+    Q_ASSERT(action);
+    _showsharescienceDockWidget(sharescienceDockWidgetNames[action->data().toInt()], show);
 }
 #endif
 
@@ -488,6 +576,9 @@ void MainWindow::_storeCurrentViewState(void)
     foreach(QGCDockWidget* dockWidget, _mapName2DockWidget) {
         dockWidget->saveSettings();
     }
+    foreach(QGCDockWidget* dockWidget, _mapName2sharescienceDockWidget) {
+        dockWidget->saveSettings();
+    }
 #endif
 
     settings.setValue(_getWindowGeometryKey(), saveGeometry());
@@ -529,6 +620,7 @@ void MainWindow::_loadVisibleWidgetsSettings(void)
 
         foreach (const QString &name, nameList) {
             _showDockWidget(name, true);
+            _showsharescienceDockWidget(name, true);
         }
     }
 }
@@ -536,7 +628,9 @@ void MainWindow::_loadVisibleWidgetsSettings(void)
 void MainWindow::_storeVisibleWidgetsSettings(void)
 {
     QString widgetNames;
+    QString sharesciencewidgetNames;
     bool firstWidget = true;
+    bool firstsharescienceWidget = true;
 
     foreach (const QString &name, _mapName2DockWidget.keys()) {
         if (_mapName2DockWidget[name]->isVisible()) {
@@ -550,9 +644,23 @@ void MainWindow::_storeVisibleWidgetsSettings(void)
         }
     }
 
+    foreach (const QString &name, _mapName2sharescienceDockWidget.keys()) {
+        if (_mapName2sharescienceDockWidget[name]->isVisible()) {
+            if (!firstsharescienceWidget) {
+                sharesciencewidgetNames += ",";
+            } else {
+                firstsharescienceWidget = false;
+            }
+
+            sharesciencewidgetNames += name;
+        }
+    }
+
     QSettings settings;
 
     settings.setValue(_visibleWidgetsKey, widgetNames);
+    settings.setValue(_visibleWidgetsKey, sharesciencewidgetNames);
+    qDebug()<<"show doc:"<<_visibleWidgetsKey;
 }
 #endif
 
@@ -566,6 +674,7 @@ void MainWindow::_showAdvancedUIChanged(bool advanced)
     if (advanced) {
         menuBar()->addMenu(_ui.menuFile);
         menuBar()->addMenu(_ui.menuWidgets);
+        menuBar()->addMenu(_ui.menusharescience);
     } else {
         menuBar()->clear();
     }

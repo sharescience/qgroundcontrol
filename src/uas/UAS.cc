@@ -152,8 +152,35 @@ int UAS::getUASID() const
     return uasId;
 }
 
+#ifndef __mobile__
+void UAS::_splice_message(mavlink_message_t message, QString& msg)
+{
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+    int len = mavlink_msg_to_send_buffer(buffer, &message);
+
+    QString hex     = QByteArray((const char*)buffer, len).toHex();
+    for (int i=0;i<hex.length();i+=2)
+    {
+        msg += hex.mid(i,2) + " ";
+    }
+}
+
+void UAS::sendMessage(mavlink_message_t message)
+{
+    QString msg="";
+    _splice_message(message, msg);
+    emit sendMessageContent(this, message.msgid, msg.trimmed().toUpper());
+}
+#endif
+
 void UAS::receiveMessage(mavlink_message_t message)
 {
+#ifndef __mobile__
+    QString msg="";
+    _splice_message(message, msg);
+    emit receiveMessageContent(this, message.msgid, msg.trimmed().toUpper());
+#endif
+
     if (!components.contains(message.compid))
     {
         QString componentName;

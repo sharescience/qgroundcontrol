@@ -157,6 +157,7 @@ private slots:
     void _closeWindow(void) { close(); }
     void _vehicleAdded(Vehicle* vehicle);
     void _showDockWidgetAction(bool show);
+    void _showsharescienceDocWidgetAction(bool show);
     void _showAdvancedUIChanged(bool advanced);
 
 #ifdef UNITTEST_BUILD
@@ -170,14 +171,18 @@ private:
     void _openUrl(const QString& url, const QString& errorMessage);
 
     QMap<QString, QGCDockWidget*>   _mapName2DockWidget;
+    QMap<QString, QGCDockWidget*>   _mapName2sharescienceDockWidget;
     QMap<QString, QAction*>         _mapName2Action;
+    QMap<QString, QAction*>         _sharesciencemapName2Action;
 
     void _storeCurrentViewState(void);
     void _loadCurrentViewState(void);
     bool _createInnerDockWidget(const QString& widgetName);
+    bool _sharesciencecreateInnerDockWidget(const QString& widgetName);
     void _buildCommonWidgets(void);
     void _hideAllDockWidgets(void);
     void _showDockWidget(const QString &name, bool show);
+    void _showsharescienceDockWidget(const QString &name, bool show);
     void _loadVisibleWidgetsSettings(void);
     void _storeVisibleWidgetsSettings(void);
     MAVLinkDecoder* _mavLinkDecoderInstance(void);
