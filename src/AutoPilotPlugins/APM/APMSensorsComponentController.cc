@@ -214,7 +214,7 @@ void APMSensorsComponentController::_mavCommandResult(int vehicleId, int compone
 
     if (command == MAV_CMD_DO_CANCEL_MAG_CAL) {
         disconnect(_vehicle, &Vehicle::mavCommandResult, this, &APMSensorsComponentController::_mavCommandResult);
-        if (result == MAV_RESULT_ACCEPTED && 0) {
+        if (result == MAV_RESULT_ACCEPTED) {
             // Onboard mag cal is supported
             _calTypeInProgress = CalTypeOnboardCompass;
             _rgCompassCalProgress[0] = 0;
