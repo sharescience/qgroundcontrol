@@ -3126,6 +3126,156 @@
 <field name="RebootRequired">True</field>
 </param>
 </parameters>
+<parameters name="EM_">
+<param humanName="current event id (Automatically detected, do not set manually)&#13;" name="EM_CURRENT" user="Standard&#13;">
+</param>
+<param humanName="Respond first event or nearest event when priority equally.&#13;" name="EM_FORN" user="Standard&#13;">
+<values>
+<value code="0">First</value>
+<value code="1">Nearest</value>
+</values>
+</param>
+<param humanName="Current event's priority((Automatically detected, do not set manually))&#13;" name="EM_CURR_P" user="Standard&#13;">
+</param>
+<param humanName="Current event's method (Automatically detected, do not set manually)&#13;" name="EM_CURR_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Current event's trigger mode (Automatically detected, do not set manually)&#13;" name="EM_CURR_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe radio event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_RADIO_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe radio event method.&#13;" name="EM_FS_RADIO_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe radio event trigger mode.&#13;" name="EM_FS_RADIO_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe battery event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_BATT_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe battery event method.&#13;" name="EM_FS_BATT_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe battery event trigger mode.&#13;" name="EM_FS_BATT_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe GCS event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_GCS_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe GCS event method.&#13;" name="EM_FS_GCS_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe GCS event trigger mode.&#13;" name="EM_FS_GCS_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe EKF event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_EKF_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe EKF event method.&#13;" name="EM_FS_EKF_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe EKF event trigger mode.&#13;" name="EM_FS_EKF_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe terrain event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_TER_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe terrain event method.&#13;" name="EM_FS_TER_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe terrain event trigger mode.&#13;" name="EM_FS_TER_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe ADSB event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_ADSB_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe ADSB event method (Must disable, because it's decided by mavlink)&#13;" name="EM_FS_ADSB_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe ADSB event trigger mode.&#13;" name="EM_FS_ADSB_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+</parameters>
 <parameters name="FENCE_">
 <param humanName="Fence enable/disable" name="FENCE_ENABLE" documentation="Allows you to enable (1) or disable (0) the fence functionality" user="Standard">
 <values>
