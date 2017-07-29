@@ -158,7 +158,10 @@ void MissionController::_newMissionItemsAvailableFromVehicle(bool removeAllReque
                 qWarning() << "First item is not settings item";
                 return;
             }
-            settingsItem->setCoordinate(newMissionItems[0]->coordinate());
+            MissionItem* fakeHomeItem = newMissionItems[0];
+            if (fakeHomeItem->coordinate().latitude() != 0 || fakeHomeItem->coordinate().longitude() != 0) {
+                settingsItem->setCoordinate(fakeHomeItem->coordinate());
+            }
             i = 1;
         }
 
@@ -1369,7 +1372,7 @@ void MissionController::_initAllVisualItems(void)
         _settingsItem->setIsCurrentItem(true);
     }
 
-    if (!_editMode && _managerVehicle->homePosition().isValid()) {
+    if (_managerVehicle->homePosition().isValid()) {
         _settingsItem->setCoordinate(_managerVehicle->homePosition());
     }
 
