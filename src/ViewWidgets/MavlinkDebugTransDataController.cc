@@ -463,3 +463,19 @@ MavlinkDebugTransDataController::timer_tick(){
         analyzeRCV();
     }
 }
+
+void
+MavlinkDebugTransDataController::clearSendList(){
+    if(_msgSendList.length() > 1){
+        _msgSendList.clear();
+        _msgSendList << "";
+    }
+}
+
+void
+MavlinkDebugTransDataController::clearReceiveList(){
+    if(_msgReceiveList.length() > 1){
+        _msgReceiveList.clear();
+        _msgReceiveList << "";
+    }
+}

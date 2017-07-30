@@ -106,6 +106,7 @@ QGCView {
                         controller.setsendCacheEnable(0)
                         controller.setmsgSendIndex(1)
                     }else{
+                        controller.clearSendList()
                         controller.setsendCacheEnable(1)
                     }
                 }
@@ -541,6 +542,7 @@ QGCView {
                         controller.setrcvCacheEnable(0)
                         controller.setmsgReceiveIndex(1)
                     }else{
+                        controller.clearReceiveList()
                         controller.setrcvCacheEnable(1)
                     }
                 }

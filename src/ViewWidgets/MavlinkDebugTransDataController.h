@@ -114,6 +114,8 @@ public:
     Q_INVOKABLE void setrcvCacheEnable    (bool enable) { _rcvCacheEnable    = enable; }
     Q_INVOKABLE void setmsgSendIndex      (int index);
     Q_INVOKABLE void setmsgReceiveIndex   (int index);
+    Q_INVOKABLE void clearSendList        ();
+    Q_INVOKABLE void clearReceiveList     ();
 
     void analyzeMessage(int*     version,
                         QString* msg,
