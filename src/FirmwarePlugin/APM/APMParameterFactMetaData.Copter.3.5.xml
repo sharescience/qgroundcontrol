@@ -2593,6 +2593,9 @@
 <value code="1">Enabled</value>
 </values>
 </param>
+<param humanName="Compass disable driver type mask" name="COMPASS_TYPEMASK" documentation="This is a bitmask of driver types to disable. If a driver type is set in this mask then that driver will not try to find a sensor at startup" user="Advanced">
+<field name="Bitmask">0:HMC5883,1:LSM303D,2:AK8963,3:BMM150,4:LSM9DS1,5:LIS3MDL,6:AK09916,7:IST8310,8:ICM20948,9:MMC3416,10:QFLIGHT,11:UAVCAN,12:QMC5883</field>
+</param>
 </parameters>
 <parameters name="EK2_">
 <param humanName="Enable EKF2" name="EK2_ENABLE" documentation="This enables EKF2. Enabling EKF2 only makes the maths run, it does not mean it will be used for flight control. To use it for flight control set AHRS_EKF_TYPE=2. A reboot or restart will need to be performed after changing the value of EK2_ENABLE for it to take effect." user="Advanced">
@@ -2857,8 +2860,8 @@
 <field name="Bitmask">0:FirstEKF,1:SecondEKF,2:ThirdEKF,3:FourthEKF,4:FifthEKF,5:SixthEKF</field>
 <field name="RebootRequired">True</field>
 </param>
-<param humanName="Bitmask control of EKF reference height correction" name="EK2_OGN_HGT_MASK" documentation="When a height sensor other than GPS is used as the primary height source by the EKF, the position of the zero height datum is defined by that sensor and its frame of reference. If a GPS height measurement is also available, then the height of the WGS-84 height datum used by the EKF can be corrected so that the height returned by the getLLH() function is compensated for primary height sensor drift and change in datum over time. The first two bit positions control when the height datum will be corrected. Correction is performed using a Bayes filter and only operates when GPS quality permits. The third bit position controls where the corrections to the GPS reference datum are applied. Corrections can be applied to the local vertical position (default) or to the reported EKF origin height." user="Advanced">
-<field name="Bitmask">0:Correct when using Baro height,1:Correct when using range finder height,2:Apply corrections to origin height</field>
+<param humanName="Bitmask control of EKF reference height correction" name="EK2_OGN_HGT_MASK" documentation="When a height sensor other than GPS is used as the primary height source by the EKF, the position of the zero height datum is defined by that sensor and its frame of reference. If a GPS height measurement is also available, then the height of the WGS-84 height datum used by the EKF can be corrected so that the height returned by the getLLH() function is compensated for primary height sensor drift and change in datum over time. The first two bit positions control when the height datum will be corrected. Correction is performed using a Bayes filter and only operates when GPS quality permits. The third bit position controls where the corrections to the GPS reference datum are applied. Corrections can be applied to the local vertical position or to the reported EKF origin height (default)." user="Advanced">
+<field name="Bitmask">0:Correct when using Baro height,1:Correct when using range finder height,2:Apply corrections to local position</field>
 <field name="RebootRequired">True</field>
 </param>
 </parameters>
@@ -3121,9 +3124,177 @@
 <field name="Bitmask">0:FirstEKF,1:SecondEKF,2:ThirdEKF,3:FourthEKF,4:FifthEKF,5:SixthEKF</field>
 <field name="RebootRequired">True</field>
 </param>
-<param humanName="Bitmask control of EKF reference height correction" name="EK3_OGN_HGT_MASK" documentation="When a height sensor other than GPS is used as the primary height source by the EKF, the position of the zero height datum is defined by that sensor and its frame of reference. If a GPS height measurement is also available, then the height of the WGS-84 height datum used by the EKF can be corrected so that the height returned by the getLLH() function is compensated for primary height sensor drift and change in datum over time. The first two bit positions control when the height datum will be corrected. Correction is performed using a Bayes filter and only operates when GPS quality permits. The third bit position controls where the corrections to the GPS reference datum are applied. Corrections can be applied to the local vertical position (default) or to the reported EKF origin height." user="Advanced">
-<field name="Bitmask">0:Correct when using Baro height,1:Correct when using range finder height,2:Apply corrections to origin height</field>
+<param humanName="Bitmask control of EKF reference height correction" name="EK3_OGN_HGT_MASK" documentation="When a height sensor other than GPS is used as the primary height source by the EKF, the position of the zero height datum is defined by that sensor and its frame of reference. If a GPS height measurement is also available, then the height of the WGS-84 height datum used by the EKF can be corrected so that the height returned by the getLLH() function is compensated for primary height sensor drift and change in datum over time. The first two bit positions control when the height datum will be corrected. Correction is performed using a Bayes filter and only operates when GPS quality permits. The third bit position controls where the corrections to the GPS reference datum are applied. Corrections can be applied to the local vertical position or to the reported EKF origin height (default)." user="Advanced">
+<field name="Bitmask">0:Correct when using Baro height,1:Correct when using range finder height,2:Apply corrections to local position</field>
 <field name="RebootRequired">True</field>
+</param>
+<param humanName="Visual odometry minimum velocity error" name="EK3_VIS_VERR_MIN" documentation="This is the 1-STD odometry velocity observation error that will be assumed when maximum quality is reported by the sensor. When quality is between max and min, the error will be calculated using linear interpolation between VIS_VERR_MIN and VIS_VERR_MAX." user="Advanced">
+<field name="Range">0.05 0.5</field>
+<field name="Increment">0.05</field>
+<field name="Units">m/s</field>
+<field name="UnitText">meters per second</field>
+</param>
+<param humanName="Visual odometry maximum velocity error" name="EK3_VIS_VERR_MAX" documentation="This is the 1-STD odometry velocity observation error that will be assumed when minimum quality is reported by the sensor. When quality is between max and min, the error will be calculated using linear interpolation between VIS_VERR_MIN and VIS_VERR_MAX." user="Advanced">
+<field name="Range">0.5 5.0</field>
+<field name="Increment">0.1</field>
+<field name="Units">m/s</field>
+<field name="UnitText">meters per second</field>
+</param>
+<param humanName="Wheel odometry velocity error" name="EK3_WENC_VERR" documentation="This is the 1-STD odometry velocity observation error that will be assumed when wheel encoder data is being fused." user="Advanced">
+<field name="Range">0.01 1.0</field>
+<field name="Increment">0.1</field>
+<field name="Units">m/s</field>
+<field name="UnitText">meters per second</field>
+</param>
+</parameters>
+<parameters name="EM_">
+<param humanName="current event id (Automatically detected, do not set manually)&#13;" name="EM_CURRENT" user="Standard&#13;">
+</param>
+<param humanName="Respond first event or nearest event when priority equally.&#13;" name="EM_FORN" user="Standard&#13;">
+<values>
+<value code="0">First</value>
+<value code="1">Nearest</value>
+</values>
+</param>
+<param humanName="Current event's priority((Automatically detected, do not set manually))&#13;" name="EM_CURR_P" user="Standard&#13;">
+</param>
+<param humanName="Current event's method (Automatically detected, do not set manually)&#13;" name="EM_CURR_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Current event's trigger mode (Automatically detected, do not set manually)&#13;" name="EM_CURR_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe radio event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_RADIO_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe radio event method.&#13;" name="EM_FS_RADIO_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe radio event trigger mode.&#13;" name="EM_FS_RADIO_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe battery event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_BATT_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe battery event method.&#13;" name="EM_FS_BATT_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe battery event trigger mode.&#13;" name="EM_FS_BATT_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe GCS event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_GCS_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe GCS event method.&#13;" name="EM_FS_GCS_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe GCS event trigger mode.&#13;" name="EM_FS_GCS_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe EKF event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_EKF_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe EKF event method.&#13;" name="EM_FS_EKF_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe EKF event trigger mode.&#13;" name="EM_FS_EKF_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe terrain event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_TER_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe terrain event method.&#13;" name="EM_FS_TER_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe terrain event trigger mode.&#13;" name="EM_FS_TER_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
+</param>
+<param humanName='Failsafe ADSB event priority("0-low, 255-high" or "0&lt;127&lt;-128&lt;-1")&#13;' name="EM_FS_ADSB_P" user="Standard&#13;">
+</param>
+<param humanName="Failsafe ADSB event method (Must disable, because it's decided by mavlink)&#13;" name="EM_FS_ADSB_M" user="Standard&#13;">
+<values>
+<value code="0">Disable</value>
+<value code="1">always LOITER</value>
+<value code="2">always RTL</value>
+<value code="3">always LAND</value>
+<value code="4">LOITER except AUTO</value>
+<value code="5">RTL except AUTO</value>
+<value code="6">LAND except AUTO</value>
+<value code="7">turn to ALT_HOLD</value>
+</values>
+</param>
+<param humanName="Failsafe ADSB event trigger mode.&#13;" name="EM_FS_ADSB_T" user="Standard&#13;">
+<values>
+<value code="0">Only once</value>
+<value code="1">Always</value>
+</values>
 </param>
 </parameters>
 <parameters name="FENCE_">
@@ -3221,8 +3392,7 @@
 <field name="Units">Pa</field>
 <field name="UnitText">pascal</field>
 </param>
-<param humanName="ground temperature" name="GND_TEMP" documentation="calibrated ground temperature in degrees Celsius" user="Advanced">
-<field name="ReadOnly">True</field>
+<param humanName="ground temperature" name="GND_TEMP" documentation="User provided ambient ground temperature in degrees Celsius. This is used to improve the calculation of the altitude the vehicle is at. This parameter is not persistent and will be reset to 0 every time the vehicle is rebooted. A value of 0 means use the internal measurement ambient temperature." user="Advanced">
 <field name="Volatile">True</field>
 <field name="Increment">1</field>
 <field name="Units">degC</field>
@@ -6192,6 +6362,11 @@
 <value code="0">Disable</value>
 <value code="1">Enable</value>
 </values>
+</param>
+<param humanName="Servo default output rate" name="SERVO_RATE" documentation="This sets the default output rate in Hz for all outputs." user="Advanced">
+<field name="Range">25 400</field>
+<field name="Units">Hz</field>
+<field name="UnitText">hertz</field>
 </param>
 </parameters>
 <parameters name="SERVO10_">

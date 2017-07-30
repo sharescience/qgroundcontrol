@@ -49,6 +49,7 @@
 #include "QGCDockWidget.h"
 #include "HILDockWidget.h"
 #include "AppMessages.h"
+#include "MavlinkDebug.h"
 #include "MavlinkTest.h"
 #include "PID.h"
 #endif
@@ -78,6 +79,7 @@ enum DockWidgetTypes {
 };
 
 enum sharescienceDockWidgetTypes {
+    MAVLINK_DEBUG,
     MAVLINK_TEST,
     PID_TUNING
 };
@@ -95,6 +97,7 @@ static const char *rgDockWidgetNames[] = {
 };
 
 static const char *sharescienceDockWidgetNames[] = {
+    "MAVLink Debug",
     "MAVLink Test",
     "PID Tuning"
 };
@@ -438,6 +441,9 @@ bool MainWindow::_sharesciencecreateInnerDockWidget(const QString& widgetName)
     QAction *action = _sharesciencemapName2Action[widgetName];
     if(action) {
         switch(action->data().toInt()) {
+            case MAVLINK_DEBUG:
+                widget = new MavlinkDebug(widgetName, action, this);
+                break;
             case MAVLINK_TEST:
                 widget = new MavlinkTest(widgetName, action, this);
                 break;

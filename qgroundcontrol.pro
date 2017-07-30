@@ -604,6 +604,8 @@ HEADERS += \
 
 !MobileBuild {
 HEADERS += \
+    src/ViewWidgets/MavlinkDebug.h \
+    src/ViewWidgets/MavlinkDebugTransDataController.h \
     src/ViewWidgets/PID.h\
     src/ViewWidgets/PIDController.h\
     src/ViewWidgets/MavlinkTest.h \
@@ -771,6 +773,8 @@ contains(DEFINES, QGC_ENABLE_BLUETOOTH) {
 
 !MobileBuild {
 SOURCES += \
+    src/ViewWidgets/MavlinkDebug.cc \
+    src/ViewWidgets/MavlinkDebugTransDataController.cc \
     src/ViewWidgets/PID.cc\
     src/ViewWidgets/PIDController.cc\
     src/ViewWidgets/MavlinkTest.cc \
