@@ -172,6 +172,7 @@ public:
                 int      ch18RCV      () { return (int)_ch18RCV; }
 
     Q_INVOKABLE void     sendChannelsOverride();
+    Q_INVOKABLE void     enableChannelsOverride(bool b) { _enableChannelsOverride = b; }
     Q_INVOKABLE void     ch1Changed(int value) { _ch1Value = (uint16_t)value; sendChannelsOverride(); }
     Q_INVOKABLE void     ch2Changed(int value) { _ch2Value = (uint16_t)value; sendChannelsOverride(); }
     Q_INVOKABLE void     ch3Changed(int value) { _ch3Value = (uint16_t)value; sendChannelsOverride(); }
@@ -250,6 +251,7 @@ private:
     uint16_t             _ch16Value;
     uint16_t             _ch17Value;
     uint16_t             _ch18Value;
+    bool                 _enableChannelsOverride;
 
     /* Evaluating Communication Quality */
 public:
