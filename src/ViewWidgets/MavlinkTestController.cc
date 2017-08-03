@@ -83,7 +83,7 @@ MavlinkTestController::MavlinkTestController(bool standaloneUnitTesting)
     /* Evaluating Communication Quality */
     connect(&_timer, &QTimer::timeout                          , this, &MavlinkTestController::_elasticityPackSend);
     _elasticitySendList<<"";
-    _elasticitySendHzList<<"1Hz"<<"2Hz"<<"3Hz"<<"4Hz"<<"5Hz"<<"6Hz"<<"7Hz"<<"8Hz"<<"9Hz"<<"10Hz"<<"0Hz";
+    _elasticitySendHzList<<"0Hz"<<"1Hz"<<"2Hz"<<"3Hz"<<"4Hz"<<"5Hz"<<"6Hz"<<"7Hz"<<"8Hz"<<"9Hz"<<"10Hz";
     _elasticityPassTime = "";
     memset(_data, 0, sizeof(_data));
     _latencyFIFO.init(180);
