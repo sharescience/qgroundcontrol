@@ -27,9 +27,9 @@ QGCView {
     property real _Width  : 15 * mm
     property real _Height : 4  * mm
 
-    property real  _max_pwm: 1900
-    property real  _min_pwm: 1100
-    property real  _mid_pwm: 1500
+    property real  _max_pwm: 2000
+    property real  _min_pwm: 1000
+    property real  _mid_pwm: 0
 
     property bool _Channels_Override_CH1_Ebale  :    false
     property bool _Channels_Override_CH2_Ebale  :    false
@@ -440,6 +440,13 @@ QGCView {
 
             id: _groupboxChannelsOverride
             title: qsTr("Channels Override(Need RC_CHAN)")
+
+            checkable: true
+            checked  : false
+
+            onCheckedChanged: {
+                controller.enableChannelsOverride(_groupboxChannelsOverride.checked)
+            }
 
             /* ----- CH1 -----*/
             CheckBox{
@@ -2090,6 +2097,9 @@ QGCView {
             id: _groupboxServosTest
             title: qsTr("Servos Test")
 
+            checkable: true
+            checked  : false
+
             /* ----- Test Time -----*/
             Label{
                 anchors.top       : parent.top
@@ -2131,7 +2141,7 @@ QGCView {
             Label{
                 anchors.verticalCenter: _comboboxServosTestTime.verticalCenter
                 anchors.left          : _comboboxServosTestTime.right
-                anchors.leftMargin    : _comboboxServosTestTime
+                anchors.leftMargin    : _margins
 
                 id    : _labelServosTestTimeNote
                 height: _Height
@@ -2180,7 +2190,7 @@ QGCView {
             Label{
                 anchors.verticalCenter: _comboboxServo1Test.verticalCenter
                 anchors.left          : _comboboxServo1Test.right
-                anchors.leftMargin    : _comboboxServo1Test
+                anchors.leftMargin    : _margins
 
                 id    : _labelServo1TestUnit
                 height: _Height
@@ -2246,7 +2256,7 @@ QGCView {
             Label{
                 anchors.verticalCenter: _comboboxServo2Test.verticalCenter
                 anchors.left          : _comboboxServo2Test.right
-                anchors.leftMargin    : _comboboxServo2Test
+                anchors.leftMargin    : _margins
 
                 id    : _labelServo2TestUnit
                 height: _Height
@@ -2312,7 +2322,7 @@ QGCView {
             Label{
                 anchors.verticalCenter: _comboboxServo3Test.verticalCenter
                 anchors.left          : _comboboxServo3Test.right
-                anchors.leftMargin    : _comboboxServo3Test
+                anchors.leftMargin    : _margins
 
                 id    : _labelServo3TestUnit
                 height: _Height
@@ -2378,7 +2388,7 @@ QGCView {
             Label{
                 anchors.verticalCenter: _comboboxServoTailTest.verticalCenter
                 anchors.left          : _comboboxServoTailTest.right
-                anchors.leftMargin    : _comboboxServoTailTest
+                anchors.leftMargin    : _margins
 
                 id    : _labelServoTailTestUnit
                 height: _Height

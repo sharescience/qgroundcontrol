@@ -54,6 +54,25 @@ MavlinkTestController::MavlinkTestController(bool standaloneUnitTesting)
     , _sr1(false)
     , _sr2(false)
     , _sr3(false)
+    , _ch1Value(0)
+    , _ch2Value(0)
+    , _ch3Value(0)
+    , _ch4Value(0)
+    , _ch5Value(0)
+    , _ch6Value(0)
+    , _ch7Value(0)
+    , _ch8Value(0)
+    , _ch9Value(0)
+    , _ch10Value(0)
+    , _ch11Value(0)
+    , _ch12Value(0)
+    , _ch13Value(0)
+    , _ch14Value(0)
+    , _ch15Value(0)
+    , _ch16Value(0)
+    , _ch17Value(0)
+    , _ch18Value(0)
+    , _enableChannelsOverride(false)
     , _elasticitySendCount(0U)
     , _elasticityRcvCount(0U)
     , _elasticityLostCount(0U)
@@ -317,6 +336,7 @@ MavlinkTestController::_handleRCChannelsRaw(mavlink_message_t message){
 
 void
 MavlinkTestController::sendChannelsOverride(){
+    if(!_enableChannelsOverride) return;
     mavlink_message_t msg;
     mavlink_msg_rc_channels_override_pack(_mavlink->getSystemId(),
                                           _mavlink->getComponentId(),
