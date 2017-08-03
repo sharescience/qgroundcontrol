@@ -163,7 +163,7 @@ void UAS::sendMessage(mavlink_message_t message)
 {
     QString msg="";
     _splice_message(message, msg);
-    emit sendMessageContent(this, message.msgid, msg.trimmed().toUpper());
+    emit sendMessageContent(this, message.msgid, msg.trimmed().toUpper(), false);
 }
 #endif
 
@@ -172,7 +172,7 @@ void UAS::receiveMessage(mavlink_message_t message)
 #ifndef __mobile__
     QString msg="";
     _splice_message(message, msg);
-    emit receiveMessageContent(this, message.msgid, msg.trimmed().toUpper());
+    emit receiveMessageContent(this, message.msgid, msg.trimmed().toUpper(), false);
 #endif
 
     if (!components.contains(message.compid))

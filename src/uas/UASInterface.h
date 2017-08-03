@@ -245,8 +245,8 @@ signals:
     void logData    (UASInterface* uas, uint32_t ofs, uint16_t id, uint8_t count, const uint8_t* data);
 #ifndef __mobile__
     // Intercept message for debug
-    void sendMessageContent   (UASInterface *uas, int mavid, QString msg);
-    void receiveMessageContent(UASInterface *uas, int mavid, QString msg);
+    void sendMessageContent   (UASInterface *uas, int mavid, QString msg, bool is_timer);
+    void receiveMessageContent(UASInterface *uas, int mavid, QString msg, bool is_timer);
 #endif
 };
 
