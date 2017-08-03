@@ -30,7 +30,7 @@
 #define MS_TO_MIN           (60*1000)
 #define MS_TO_S             1000
 #define MSG_LIST_LEN        100
-#define TIMER_FREQUENCY_HZ  3
+#define TIMER_FREQUENCY_HZ  2
 
 //----------------------------------------------------------------------------------------
 MavlinkDebugTransDataController::MavlinkDebugTransDataController(bool standaloneUnitTesting)
@@ -231,7 +231,9 @@ MavlinkDebugTransDataController::analyzeSend(){
     }else if(_sendMessageHex.mid(0, 2).toInt(0, 16) == MAVLINK_STX){
         _sendVersion = 2;
     }else{
-        qDebug()<<"unknown mavlink version!";
+        if(_vehicle){
+            qDebug()<<"send unknown mavlink version!";
+        }
     }
     emit sendVersionChanged();
 
@@ -282,7 +284,9 @@ MavlinkDebugTransDataController::analyzeRCV(){
     }else if(_rcvMessageHex.mid(0, 2).toInt(0, 16) == MAVLINK_STX){
         _rcvVersion = 2;
     }else{
-        qDebug()<<"unknown mavlink version!";
+        if(_vehicle){
+            qDebug()<<"receive unknown mavlink version!";
+        }
     }
     emit rcvVersionChanged();
 
@@ -457,10 +461,10 @@ MavlinkDebugTransDataController::timer_tick(){
     int sendMavIDChooseInQML = _sendMavIDChoose.mid(0,6).toInt(0, 16);
 
     if(sendMavIDChooseInQML == -1){
-        analyzeSend();
+        _sendMessageContent(_uas, _sendMavID, _sendMessageHex);
     }
     if(rcvMavIDChooseInQML == -1){
-        analyzeRCV();
+        _receiveMessageContent(_uas, _rcvMavID, _rcvMessageHex);
     }
 }
 
