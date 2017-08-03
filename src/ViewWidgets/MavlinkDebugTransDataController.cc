@@ -82,6 +82,8 @@ MavlinkDebugTransDataController::setsendMavIDChoose(QString id)
     if( _sendMavIDChoose.mid(0,6).toInt(0, 16) == -1 && !_addNewItemCauseChooseChangeSend ){
         _idListSend.clear();
         _idListSend<<"-1";
+        _sendMessageHex = "";
+        emit sendMessageHexChanged();
         emit idListSendChanged();
     }
 
@@ -94,7 +96,7 @@ MavlinkDebugTransDataController::setsendMavIDChoose(QString id)
 }
 
 void
-MavlinkDebugTransDataController::_sendMessageContent(UASInterface *uas, int mavid, QString msg)
+MavlinkDebugTransDataController::_sendMessageContent(UASInterface *uas, int mavid, QString msg, bool is_timer)
 {
     QDateTime   currentTimeSend                 = QDateTime::currentDateTime();
     static      QDateTime lastTimeSend          = currentTimeSend;
@@ -134,7 +136,7 @@ MavlinkDebugTransDataController::_sendMessageContent(UASInterface *uas, int mavi
         emit sendHzChanged();
     }
 
-    if(_sendMavID == sendMavIDChooseInQML){
+    if(_sendMavID == sendMavIDChooseInQML && !is_timer){
         if(!ignorOnceSend){
             _sendHz = QString::number(1000.0f/lastTimeSend.msecsTo(currentTimeSend),'g',2)+"Hz";
             emit sendHzChanged();
@@ -155,6 +157,8 @@ MavlinkDebugTransDataController::setrcvMavIDChoose(QString id)
     if( _rcvMavIDChoose.mid(0,6).toInt(0, 16) == -1 && !_addNewItemCauseChooseChangeReceive ){
         _idListReceive.clear();
         _idListReceive<<"-1";
+        _rcvMessageHex = "";
+        emit rcvMessageHexChanged();
         emit idListReceiveChanged();
 
     }
@@ -168,7 +172,7 @@ MavlinkDebugTransDataController::setrcvMavIDChoose(QString id)
 }
 
 void
-MavlinkDebugTransDataController::_receiveMessageContent(UASInterface *uas, int mavid, QString msg)
+MavlinkDebugTransDataController::_receiveMessageContent(UASInterface *uas, int mavid, QString msg, bool is_timer)
 {
     QDateTime   currentTime                 = QDateTime::currentDateTime();
     static      QDateTime lastTime          = currentTime;
@@ -208,7 +212,7 @@ MavlinkDebugTransDataController::_receiveMessageContent(UASInterface *uas, int m
         emit rcvHzChanged();
     }
 
-    if(_rcvMavID == rcvMavIDChooseInQML){
+    if(_rcvMavID == rcvMavIDChooseInQML && !is_timer){
         if(!ignorOnce){
             _rcvHz = QString::number(1000.0f/lastTime.msecsTo(currentTime),'g',2)+"Hz";
             emit rcvHzChanged();
@@ -461,10 +465,15 @@ MavlinkDebugTransDataController::timer_tick(){
     int sendMavIDChooseInQML = _sendMavIDChoose.mid(0,6).toInt(0, 16);
 
     if(sendMavIDChooseInQML == -1){
-        _sendMessageContent(_uas, _sendMavID, _sendMessageHex);
+        analyzeSend();
+    }else{
+        _sendMessageContent(_uas, _sendMavID, _sendMessageHex, true);
     }
+
     if(rcvMavIDChooseInQML == -1){
-        _receiveMessageContent(_uas, _rcvMavID, _rcvMessageHex);
+        analyzeRCV();
+    }else{
+        _receiveMessageContent(_uas, _rcvMavID, _rcvMessageHex, true);
     }
 }
 

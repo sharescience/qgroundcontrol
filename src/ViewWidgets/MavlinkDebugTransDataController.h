@@ -174,8 +174,8 @@ signals:
 
 private slots:
     void _setActiveVehicle  (Vehicle* vehicle);
-    void _receiveMessageContent(UASInterface *uas, int mavid, QString msg);
-    void _sendMessageContent(UASInterface *uas, int mavid, QString msg);
+    void _receiveMessageContent(UASInterface *uas, int mavid, QString msg, bool is_timer);
+    void _sendMessageContent(UASInterface *uas, int mavid, QString msg, bool is_timer);
 
 private:
     Vehicle*            _vehicle;
