@@ -7,12 +7,7 @@
  *
  ****************************************************************************/
 
-
-/// @file
-///     @author Don Gagne <don@thegagnes.com>
-
-#ifndef Vehicle_H
-#define Vehicle_H
+#pragma once
 
 #include <QObject>
 #include <QGeoCoordinate>
@@ -642,6 +637,10 @@ public:
     /// Signals: mavCommandResult on success or failure
     void sendMavCommand(int component, MAV_CMD command, bool showError, float param1 = 0.0f, float param2 = 0.0f, float param3 = 0.0f, float param4 = 0.0f, float param5 = 0.0f, float param6 = 0.0f, float param7 = 0.0f);
 
+    /// Same as sendMavCommand but available from Qml.
+    Q_INVOKABLE void sendCommand(int component, int command, bool showError, double param1 = 0.0f, double param2 = 0.0f, double param3 = 0.0f, double param4 = 0.0f, double param5 = 0.0f, double param6 = 0.0f, double param7 = 0.0f)
+        { sendMavCommand(component, (MAV_CMD)command, showError, param1, param2, param3, param4, param5, param6, param7); }
+
     int firmwareMajorVersion(void) const { return _firmwareMajorVersion; }
     int firmwareMinorVersion(void) const { return _firmwareMinorVersion; }
     int firmwarePatchVersion(void) const { return _firmwarePatchVersion; }
@@ -687,8 +686,8 @@ public:
     const QVariantList& toolBarIndicators   ();
     const QVariantList& cameraList          (void) const;
 
-    bool capabilitiesKnown(void) const { return _vehicleCapabilitiesKnown; }
-    bool supportsMissionItemInt(void) const { return _supportsMissionItemInt; }
+    bool capabilitiesKnown      (void) const { return _vehicleCapabilitiesKnown; }
+    uint64_t capabilityBits     (void) const { return _capabilityBits; }    // Change signalled by capabilityBitsChanged
 
     /// @true: When flying a mission the vehicle is always facing towards the next waypoint
     bool vehicleYawsToNextWaypointInMission(void) const;
@@ -731,6 +730,8 @@ signals:
     void firmwareTypeChanged(void);
     void vehicleTypeChanged(void);
     void capabilitiesKnownChanged(bool capabilitiesKnown);
+    void initialPlanRequestCompleted(void);
+    void capabilityBitsChanged(uint64_t capabilityBits);
 
     void messagesReceivedChanged    ();
     void messagesSentChanged        ();
@@ -946,7 +947,7 @@ private:
     int             _telemetryRNoise;
     unsigned        _maxProtoVersion;
     bool            _vehicleCapabilitiesKnown;
-    bool            _supportsMissionItemInt;
+    uint64_t        _capabilityBits;
 
     typedef struct {
         int     component;
@@ -1087,4 +1088,3 @@ private:
     static const char* _joystickEnabledSettingsKey;
 
 };
-#endif
