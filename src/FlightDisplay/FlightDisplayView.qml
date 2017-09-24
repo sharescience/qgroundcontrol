@@ -49,7 +49,7 @@ QGCView {
     property bool   _isPipVisible:          QGroundControl.videoManager.hasVideo ? QGroundControl.loadBoolGlobalSetting(_PIPVisibleKey, true) : false
     property real   _savedZoomLevel:        0
     property real   _margins:               ScreenTools.defaultFontPixelWidth / 2
-    property real   _pipSize:               mainWindow.width * 0.2
+    property real   _pipSize:               flightView.width * 0.2
     property alias  _guidedController:      guidedActionsController
     property alias  _altitudeSlider:        altitudeSlider
 
@@ -92,12 +92,6 @@ QGCView {
         QGroundControl.saveBoolGlobalSetting(_PIPVisibleKey, state)
     }
 
-    function px4JoystickCheck() {
-        if ( _activeVehicle && !_activeVehicle.supportsManualControl && (QGroundControl.settingsManager.appSettings.virtualJoystick.value || _activeVehicle.joystickEnabled)) {
-            px4JoystickSupport.open()
-        }
-    }
-
     PlanMasterController {
         id:                     masterController
         Component.onCompleted:  start(false /* editMode */)
@@ -109,28 +103,8 @@ QGCView {
         onResumeMissionUploadFail:  guidedActionsController.confirmAction(guidedActionsController.actionResumeMissionUploadFail)
     }
 
-    MessageDialog {
-        id:     px4JoystickSupport
-        text:   qsTr("Joystick support requires MAVLink MANUAL_CONTROL support. ") +
-                qsTr("The firmware you are running does not normally support this. ") +
-                qsTr("It will only work if you have modified the firmware to add MANUAL_CONTROL support.")
-    }
-
-    Connections {
-        target:                 QGroundControl.multiVehicleManager
-        onActiveVehicleChanged: px4JoystickCheck()
-    }
-
-    Connections {
-        target:         QGroundControl.settingsManager.appSettings.virtualJoystick
-        onValueChanged: px4JoystickCheck()
-    }
-
-    onActiveVehicleJoystickEnabledChanged: px4JoystickCheck()
-
     Component.onCompleted: {
         setStates()
-        px4JoystickCheck()
         if(QGroundControl.corePlugin.options.flyViewOverlay.toString().length) {
             flyViewOverlay.source = QGroundControl.corePlugin.options.flyViewOverlay
         }
@@ -311,6 +285,9 @@ QGCView {
             onHideIt: {
                 setPipVisibility(!state)
             }
+            onNewWidth: {
+                _pipSize = newWidth
+            }
         }
 
         Row {
@@ -374,7 +351,7 @@ QGCView {
             anchors.right:      _flightVideo.right
             height:             ScreenTools.defaultFontPixelHeight * 2
             width:              height
-            visible:            _videoReceiver && _videoReceiver.videoRunning && QGroundControl.settingsManager.videoSettings.showRecControl.rawValue
+            visible:            _videoReceiver && _videoReceiver.videoRunning && QGroundControl.settingsManager.videoSettings.showRecControl.rawValue && _flightVideo.visible
             opacity:            0.75
 
             readonly property string recordBtnBackground: "BackgroundName"
