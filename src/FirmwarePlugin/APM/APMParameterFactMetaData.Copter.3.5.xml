@@ -13,6 +13,7 @@
 <value code="4">AntennaTracker</value>
 <value code="10">Copter</value>
 <value code="20">Rover</value>
+<value code="40">ArduSub</value>
 </values>
 </param>
 <param humanName="MAVLink system ID of this vehicle" name="ArduCopter:SYSID_THISMAV" documentation="Allows setting an individual MAVLink system id for this vehicle to distinguish it from others on the same network" user="Advanced">
@@ -22,12 +23,6 @@
 <values>
 <value code="255">Mission Planner and DroidPlanner</value>
 <value code=" 252"> AP Planner 2</value>
-</values>
-</param>
-<param humanName="CLI Enable" name="ArduCopter:CLI_ENABLED" documentation="This enables/disables the checking for three carriage returns on telemetry links on startup to enter the diagnostics command line interface" user="Advanced">
-<values>
-<value code="0">Disabled</value>
-<value code="1">Enabled</value>
 </values>
 </param>
 <param humanName="Throttle filter cutoff" name="ArduCopter:PILOT_THR_FILT" documentation="Throttle filter cutoff (Hz) - active whenever altitude control is inactive - 0 to disable" user="Advanced">
@@ -286,6 +281,7 @@
 <value code="18">Throw</value>
 <value code="19">Avoid_ADSB</value>
 <value code="20">Guided_NoGPS</value>
+<value code="21">Smart_RTL</value>
 </values>
 </param>
 <param humanName="Flight Mode 2" name="ArduCopter:FLTMODE2" documentation="Flight mode when Channel 5 pwm is &gt;1230, &lt;= 1360" user="Standard">
@@ -308,6 +304,7 @@
 <value code="18">Throw</value>
 <value code="19">Avoid_ADSB</value>
 <value code="20">Guided_NoGPS</value>
+<value code="21">Smart_RTL</value>
 </values>
 </param>
 <param humanName="Flight Mode 3" name="ArduCopter:FLTMODE3" documentation="Flight mode when Channel 5 pwm is &gt;1360, &lt;= 1490" user="Standard">
@@ -330,6 +327,7 @@
 <value code="18">Throw</value>
 <value code="19">Avoid_ADSB</value>
 <value code="20">Guided_NoGPS</value>
+<value code="21">Smart_RTL</value>
 </values>
 </param>
 <param humanName="Flight Mode 4" name="ArduCopter:FLTMODE4" documentation="Flight mode when Channel 5 pwm is &gt;1490, &lt;= 1620" user="Standard">
@@ -352,6 +350,7 @@
 <value code="18">Throw</value>
 <value code="19">Avoid_ADSB</value>
 <value code="20">Guided_NoGPS</value>
+<value code="21">Smart_RTL</value>
 </values>
 </param>
 <param humanName="Flight Mode 5" name="ArduCopter:FLTMODE5" documentation="Flight mode when Channel 5 pwm is &gt;1620, &lt;= 1749" user="Standard">
@@ -374,6 +373,7 @@
 <value code="18">Throw</value>
 <value code="19">Avoid_ADSB</value>
 <value code="20">Guided_NoGPS</value>
+<value code="21">Smart_RTL</value>
 </values>
 </param>
 <param humanName="Flight Mode 6" name="ArduCopter:FLTMODE6" documentation="Flight mode when Channel 5 pwm is &gt;=1750" user="Standard">
@@ -396,6 +396,7 @@
 <value code="18">Throw</value>
 <value code="19">Avoid_ADSB</value>
 <value code="20">Guided_NoGPS</value>
+<value code="21">Smart_RTL</value>
 </values>
 </param>
 <param humanName="Simple mode bitmask" name="ArduCopter:SIMPLE" documentation="Bitmask which holds which flight modes use simple heading mode (eg bit 0 = 1 means Flight Mode 0 uses simple mode)" user="Advanced">
@@ -522,6 +523,7 @@
 <value code=" 39">PrecLoiter</value>
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
+<value code=" 42">SmartRTL</value>
 </values>
 </param>
 <param humanName="Channel 8 option" name="ArduCopter:CH8_OPT" documentation="Select which function is performed when CH8 is above 1800 pwm" user="Standard">
@@ -563,6 +565,7 @@
 <value code=" 39">PrecLoiter</value>
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
+<value code=" 42">SmartRTL</value>
 </values>
 </param>
 <param humanName="Channel 9 option" name="ArduCopter:CH9_OPT" documentation="Select which function is performed when CH9 is above 1800 pwm" user="Standard">
@@ -604,6 +607,7 @@
 <value code=" 39">PrecLoiter</value>
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
+<value code=" 42">SmartRTL</value>
 </values>
 </param>
 <param humanName="Channel 10 option" name="ArduCopter:CH10_OPT" documentation="Select which function is performed when CH10 is above 1800 pwm" user="Standard">
@@ -645,6 +649,7 @@
 <value code=" 39">PrecLoiter</value>
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
+<value code=" 42">SmartRTL</value>
 </values>
 </param>
 <param humanName="Channel 11 option" name="ArduCopter:CH11_OPT" documentation="Select which function is performed when CH11 is above 1800 pwm" user="Standard">
@@ -686,6 +691,7 @@
 <value code=" 39">PrecLoiter</value>
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
+<value code=" 42">SmartRTL</value>
 </values>
 </param>
 <param humanName="Channel 12 option" name="ArduCopter:CH12_OPT" documentation="Select which function is performed when CH12 is above 1800 pwm" user="Standard">
@@ -727,6 +733,7 @@
 <value code=" 39">PrecLoiter</value>
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
+<value code=" 42">SmartRTL</value>
 </values>
 </param>
 <param humanName="Disarm delay" name="ArduCopter:DISARM_DELAY" documentation="Delay before automatic disarm in seconds. A value of zero disables auto disarm." user="Advanced">
@@ -1037,7 +1044,7 @@
 <value code="1">AppliedBySensor</value>
 </values>
 </param>
-<param humanName="Transceiver RF selection" name="ADSB_RF_SELECT" documentation="Transceiver RF selection for Rx enable and/or Tx enable." user="Advanced">
+<param humanName="Transceiver RF selection" name="ADSB_RF_SELECT" documentation="Transceiver RF selection for Rx enable and/or Tx enable. This only effects devices that can Tx and Rx. Rx-only devices override this to always be Rx-only." user="Advanced">
 <values>
 <value code="0">Disabled</value>
 <value code="1">Rx-Only</value>
@@ -1059,7 +1066,7 @@
 </param>
 <param humanName="Force Terminate" name="AFS_TERMINATE" documentation="Can be set in flight to force termination of the heartbeat signal" user="Advanced">
 </param>
-<param humanName="Terminate action" name="AFS_TERM_ACTION" documentation="This can be used to force an action on flight termination. Normally this is handled by an external failsafe board, but you can setup APM to handle it here. If set to 0 (which is the default) then no extra action is taken. If set to the magic value 42 then the plane will deliberately crash itself by setting maximum throws on all surfaces, and zero throttle" user="Advanced">
+<param humanName="Terminate action" name="AFS_TERM_ACTION" documentation="This can be used to force an action on flight termination. Normally this is handled by an external failsafe board, but you can setup APM to handle it here. Please consult the wiki for more information on the possible values of the parameter" user="Advanced">
 </param>
 <param humanName="Terminate Pin" name="AFS_TERM_PIN" documentation="This sets a digital output pin to set high on flight termination" user="Advanced">
 </param>
@@ -1225,12 +1232,12 @@
 <field name="Units">m/s/s</field>
 <field name="UnitText">meters per square second</field>
 </param>
-<param humanName="Minimum arming voltage on the first battery" name="ARMING_MIN_VOLT" documentation="The minimum voltage on the first battery to arm, 0 disables the check.  This parameter is relevant for ArduPlane only." user="Standard">
+<param humanName="Arming voltage minimum on the first battery" name="ARMING_VOLT_MIN" documentation="The minimum voltage on the first battery to arm, 0 disables the check" user="Standard">
 <field name="Increment">0.1 </field>
 <field name="Units">V</field>
 <field name="UnitText">volt</field>
 </param>
-<param humanName="Minimum arming voltage on the second battery" name="ARMING_MIN_VOLT2" documentation="The minimum voltage on the first battery to arm, 0 disables the check. This parameter is relevant for ArduPlane only." user="Standard">
+<param humanName="Arming voltage minimum on the second battery" name="ARMING_VOLT2_MIN" documentation="The minimum voltage on the first battery to arm, 0 disables the check" user="Standard">
 <field name="Increment">0.1 </field>
 <field name="Units">V</field>
 <field name="UnitText">volt</field>
@@ -1396,12 +1403,6 @@
 <param humanName="Throttle Mix Manual" name="ATC_THR_MIX_MAN" documentation="Throttle vs attitude control prioritisation used during manual flight (higher values mean we prioritise attitude control over throttle)" user="Advanced">
 <field name="Range">0.5 0.9</field>
 </param>
-<param humanName="Piro Comp Enable" name="ATC_PIRO_COMP" documentation="Pirouette compensation enabled" user="Advanced">
-<values>
-<value code="0">Disabled</value>
-<value code="1">Enabled</value>
-</values>
-</param>
 <param humanName="Hover Roll Trim" name="ATC_HOVR_ROL_TRM" documentation="Trim the hover roll angle to counter tail rotor thrust in a hover" user="Advanced">
 <field name="Range">0 1000</field>
 <field name="Units">cdeg</field>
@@ -1484,6 +1485,12 @@
 <field name="Increment">1</field>
 <field name="Units">Hz</field>
 <field name="UnitText">hertz</field>
+</param>
+<param humanName="Piro Comp Enable" name="ATC_PIRO_COMP" documentation="Pirouette compensation enabled" user="Advanced">
+<values>
+<value code="0">Disabled</value>
+<value code="1">Enabled</value>
+</values>
 </param>
 </parameters>
 <parameters name="AVD_">
@@ -1775,7 +1782,7 @@
 <value code="0">AUTO</value>
 <value code="1">PX4V1</value>
 <value code="2">Pixhawk</value>
-<value code="3">Pixhawk2</value>
+<value code="3">Cube/Pixhawk2</value>
 <value code="4">Pixracer</value>
 <value code="5">PixhawkMini</value>
 <value code="6">Pixhawk2Slim</value>
@@ -3380,7 +3387,7 @@
 <field name="Units">m</field>
 <field name="UnitText">meters</field>
 </param>
-<param humanName="ID on the bus" name="FLOW_BUS_ID" documentation="This is used to select between multiple possible bus IDs for some sensor types. For PX4Flow you can choose 0 to 7 for the 8 possible addresses on the I2C bus." user="Advanced">
+<param humanName="Address on the bus" name="FLOW_ADDR" documentation="This is used to select between multiple possible I2C addresses for some sensor types. For PX4Flow you can choose 0 to 7 for the 8 possible addresses on the I2C bus." user="Advanced">
 <field name="Range">0 127</field>
 </param>
 </parameters>
@@ -4204,6 +4211,8 @@
 </param>
 <param humanName="Fast sampling mask" name="INS_FAST_SAMPLE" documentation="Mask of IMUs to enable fast sampling on, if available" user="Advanced">
 </param>
+<param humanName="Notch filter" name="INS_NOTCH_" documentation="Gyro notch filter" user="Advanced">
+</param>
 </parameters>
 <parameters name="LGR_">
 <param humanName="Landing Gear Servo Retracted PWM Value" name="LGR_SERVO_RTRACT" documentation="Servo PWM value in microseconds when landing gear is retracted" user="Standard">
@@ -4217,6 +4226,13 @@
 <field name="Increment">1</field>
 <field name="Units">PWM</field>
 <field name="UnitText">PWM in microseconds</field>
+</param>
+<param humanName="Landing Gear Startup position" name="LGR_STARTUP" documentation="Landing Gear Startup behaviour control" user="Standard">
+<values>
+<value code="0">WaitForPilotInput</value>
+<value code=" 1">Retract</value>
+<value code=" 2">Deploy</value>
+</values>
 </param>
 </parameters>
 <parameters name="LOG">
@@ -4259,6 +4275,9 @@
 <value code="0">Resume Mission</value>
 <value code=" 1">Restart Mission</value>
 </values>
+</param>
+<param humanName="Mission options bitmask" name="MIS_OPTIONS" documentation="Bitmask of what options to use in missions." user="Advanced">
+<field name="Bitmask">0:Clear Mission on reboot</field>
 </param>
 </parameters>
 <parameters name="MNT">
@@ -4786,6 +4805,7 @@
 <value code="2">MAVLink</value>
 <value code="3">TeraRangerTower</value>
 <value code="4">RangeFinder</value>
+<value code="5">RPLidarA2</value>
 </values>
 <field name="RebootRequired">True</field>
 </param>
@@ -4867,6 +4887,7 @@
 <value code="2">MAVLink</value>
 <value code="3">TeraRangerTower</value>
 <value code="4">RangeFinder</value>
+<value code="5">RPLidarA2</value>
 </values>
 <field name="RebootRequired">True</field>
 </param>
@@ -5534,7 +5555,7 @@
 <value code="11">uLanding</value>
 <value code="12">LeddarOne</value>
 <value code="13">MaxbotixSerial</value>
-<value code="14">TrOneI2C</value>
+<value code="14">TeraRangerI2C</value>
 <value code="15">LidarLiteV3-I2C</value>
 <value code="16">VL53L0X</value>
 </values>
@@ -5668,7 +5689,7 @@
 <value code="11">uLanding</value>
 <value code="12">LeddarOne</value>
 <value code="13">MaxbotixSerial</value>
-<value code="14">TrOneI2C</value>
+<value code="14">TeraRangerI2C</value>
 <value code="15">LidarLiteV3-I2C</value>
 <value code="16">VL53L0X</value>
 </values>
@@ -5797,7 +5818,7 @@
 <value code="11">uLanding</value>
 <value code="12">LeddarOne</value>
 <value code="13">MaxbotixSerial</value>
-<value code="14">TrOneI2C</value>
+<value code="14">TeraRangerI2C</value>
 <value code="15">LidarLiteV3-I2C</value>
 <value code="16">VL53L0X</value>
 </values>
@@ -5926,7 +5947,7 @@
 <value code="11">uLanding</value>
 <value code="12">LeddarOne</value>
 <value code="13">MaxbotixSerial</value>
-<value code="14">TrOneI2C</value>
+<value code="14">TeraRangerI2C</value>
 <value code="15">LidarLiteV3-I2C</value>
 <value code="16">VL53L0X</value>
 </values>
@@ -8331,6 +8352,17 @@
 <field name="Increment">1</field>
 <field name="Units">Hz</field>
 <field name="UnitText">hertz</field>
+</param>
+</parameters>
+<parameters name="SRTL_">
+<param humanName="SmartRTL accuracy" name="SRTL_ACCURACY" documentation="SmartRTL accuracy. The minimum distance between points." user="Advanced">
+<field name="Range">0 10</field>
+<field name="Units">m</field>
+<field name="UnitText">meters</field>
+</param>
+<param humanName="SmartRTL maximum number of points on path" name="SRTL_POINTS" documentation="SmartRTL maximum number of points on path. Set to 0 to disable SmartRTL.  100 points consumes about 3k of memory." user="Advanced">
+<field name="Range">0 500</field>
+<field name="RebootRequired">True</field>
 </param>
 </parameters>
 <parameters name="STAT">

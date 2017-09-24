@@ -501,6 +501,7 @@ HEADERS += \
     src/MissionManager/FixedWingLandingComplexItem.h \
     src/MissionManager/GeoFenceController.h \
     src/MissionManager/GeoFenceManager.h \
+    src/MissionManager/KML.h \
     src/MissionManager/MissionCommandList.h \
     src/MissionManager/MissionCommandTree.h \
     src/MissionManager/MissionCommandUIInfo.h \
@@ -553,6 +554,7 @@ HEADERS += \
     src/QtLocationPlugin/QMLControl/QGCMapEngineManager.h \
     src/Settings/AppSettings.h \
     src/Settings/AutoConnectSettings.h \
+    src/Settings/BrandImageSettings.h \
     src/Settings/FlightMapSettings.h \
     src/Settings/GuidedSettings.h \
     src/Settings/RTKSettings.h \
@@ -691,6 +693,7 @@ SOURCES += \
     src/MissionManager/FixedWingLandingComplexItem.cc \
     src/MissionManager/GeoFenceController.cc \
     src/MissionManager/GeoFenceManager.cc \
+    src/MissionManager/KML.cc \
     src/MissionManager/MissionCommandList.cc \
     src/MissionManager/MissionCommandTree.cc \
     src/MissionManager/MissionCommandUIInfo.cc \
@@ -740,6 +743,7 @@ SOURCES += \
     src/QtLocationPlugin/QMLControl/QGCMapEngineManager.cc \
     src/Settings/AppSettings.cc \
     src/Settings/AutoConnectSettings.cc \
+    src/Settings/BrandImageSettings.cc \
     src/Settings/FlightMapSettings.cc \
     src/Settings/GuidedSettings.cc \
     src/Settings/RTKSettings.cc \
