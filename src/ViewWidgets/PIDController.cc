@@ -26,14 +26,6 @@
 #include <QBitArray>
 #include <QtCore/qmath.h>
 
-#define LOW2BYTE(i) ((uint16_t)(i))
-#define HIGH2BYTE(i) ((uint16_t)(((uint16_t)(i))>>16))
-
-#define MAX_PACKET_LOST_NUM 1024
-#define MS_TO_H             (60*60*1000)
-#define MS_TO_MIN           (60*1000)
-#define MS_TO_S             1000
-
 //----------------------------------------------------------------------------------------
 PIDController::PIDController(bool standaloneUnitTesting)
     : FactPanelController(standaloneUnitTesting)
@@ -42,7 +34,6 @@ PIDController::PIDController(bool standaloneUnitTesting)
     MultiVehicleManager *manager = qgcApp()->toolbox()->multiVehicleManager();
     connect(manager, &MultiVehicleManager::activeVehicleChanged, this, &PIDController::_setActiveVehicle);
     _setActiveVehicle(manager->activeVehicle());
-
 }
 
 //----------------------------------------------------------------------------------------
@@ -50,7 +41,9 @@ void
 PIDController::_setActiveVehicle(Vehicle* vehicle)
 {
     if(_uas) {
-        connect(vehicle->uas(), &UASInterface::parameterUpdate, this, &PIDController::_parameterUpdate);
+        if(vehicle){
+            disconnect(vehicle->uas(), &UASInterface::parameterUpdate, this, &PIDController::_parameterUpdate);
+        }
         _uas = NULL;
     }
     _vehicle = vehicle;
