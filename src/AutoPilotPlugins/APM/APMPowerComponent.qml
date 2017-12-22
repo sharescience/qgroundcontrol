@@ -29,6 +29,7 @@ SetupPage {
         Column {
             spacing: _margins
 
+            property Fact armVoltMin:       controller.getParameterFact(-1, "r.ARMING_VOLT_MIN")
             property Fact battAmpPerVolt:   controller.getParameterFact(-1, "BATT_AMP_PERVOLT")
             property Fact battCapacity:     controller.getParameterFact(-1, "BATT_CAPACITY")
             property Fact battCurrPin:      controller.getParameterFact(-1, "BATT_CURR_PIN")
@@ -82,7 +83,7 @@ SetupPage {
                 }
 
                 ListElement {
-                    text:       "3DR Iris"
+                    text:       qsTr("3DR Iris")
                     voltPin:    2
                     currPin:    3
                     voltMult:   12.02
@@ -113,7 +114,7 @@ SetupPage {
                             QGCLabel {
                                 width:      parent.width
                                 wrapMode:   Text.WordWrap
-                                text:       "Measure battery voltage using an external voltmeter and enter the value below. Click Calculate to set the new voltage multiplier."
+                                text:       qsTr("Measure battery voltage using an external voltmeter and enter the value below. Click Calculate to set the new voltage multiplier.")
                             }
 
                             Grid {
@@ -122,14 +123,14 @@ SetupPage {
                                 verticalItemAlignment: Grid.AlignVCenter
 
                                 QGCLabel {
-                                    text: "Measured voltage:"
+                                    text: qsTr("Measured voltage:")
                                 }
                                 QGCTextField { id: measuredVoltage }
 
-                                QGCLabel { text: "Vehicle voltage:" }
+                                QGCLabel { text: qsTr("Vehicle voltage:") }
                                 QGCLabel { text: controller.vehicle.battery.voltage.valueString }
 
-                                QGCLabel { text: "Voltage multiplier:" }
+                                QGCLabel { text: qsTr("Voltage multiplier:") }
                                 FactLabel { fact: battVoltMult }
                             }
 
@@ -171,7 +172,7 @@ SetupPage {
                             QGCLabel {
                                 width:      parent.width
                                 wrapMode:   Text.WordWrap
-                                text:       "Measure current draw using an external current meter and enter the value below. Click Calculate to set the new amps per volt value."
+                                text:       qsTr("Measure current draw using an external current meter and enter the value below. Click Calculate to set the new amps per volt value.")
                             }
 
                             Grid {
@@ -180,14 +181,14 @@ SetupPage {
                                 verticalItemAlignment: Grid.AlignVCenter
 
                                 QGCLabel {
-                                    text: "Measured current:"
+                                    text: qsTr("Measured current:")
                                 }
                                 QGCTextField { id: measuredCurrent }
 
-                                QGCLabel { text: "Vehicle current:" }
+                                QGCLabel { text: qsTr("Vehicle current:") }
                                 QGCLabel { text: controller.vehicle.battery.current.valueString }
 
-                                QGCLabel { text: "Amps per volt:" }
+                                QGCLabel { text: qsTr("Amps per volt:") }
                                 FactLabel { fact: battAmpPerVolt }
                             }
 
@@ -239,6 +240,18 @@ SetupPage {
                 QGCLabel {
                     Layout.row:     2
                     Layout.column:  0
+                    text:           qsTr("Minimum arming voltage:")
+                }
+
+                FactTextField {
+                    id:     armVoltField
+                    width:  _fieldWidth
+                    fact:   armVoltMin
+                }
+
+                QGCLabel {
+                    Layout.row:     3
+                    Layout.column:  0
                     text:           qsTr("Power sensor:")
                 }
 
@@ -260,7 +273,7 @@ SetupPage {
                 }
 
                 QGCLabel {
-                    Layout.row:     3
+                    Layout.row:     4
                     Layout.column:  0
                     text:           qsTr("Current pin:")
                     visible:        _showAdvanced
@@ -269,11 +282,12 @@ SetupPage {
                 FactComboBox {
                     Layout.minimumWidth:    _fieldWidth
                     fact:                   battCurrPin
+                    indexModel:             false
                     visible:                _showAdvanced
                 }
 
                 QGCLabel {
-                    Layout.row:     4
+                    Layout.row:     5
                     Layout.column:  0
                     text:           qsTr("Voltage pin:")
                     visible:        _showAdvanced
@@ -287,7 +301,7 @@ SetupPage {
                 }
 
                 QGCLabel {
-                    Layout.row:     5
+                    Layout.row:     6
                     Layout.column:  0
                     text:           qsTr("Voltage multiplier:")
                     visible:        _showAdvanced

@@ -25,6 +25,8 @@
 #include <QVariantList>
 
 class Vehicle;
+class QGCCameraControl;
+class QGCCameraManager;
 
 /// This is the base class for Firmware specific plugins
 ///
@@ -126,7 +128,7 @@ public:
     virtual void guidedModeLand(Vehicle* vehicle);
 
     /// Command vehicle to takeoff from current location to a firmware specific height.
-    virtual void guidedModeTakeoff(Vehicle* vehicle);
+    virtual void guidedModeTakeoff(Vehicle* vehicle, double takeoffAltRel);
 
     /// Command the vehicle to start the mission
     virtual void startMission(Vehicle* vehicle);
@@ -255,11 +257,19 @@ public:
     virtual QString vehicleImageCompass(const Vehicle* vehicle) const;
 
     /// Allows the core plugin to override the toolbar indicators
+    ///     signals toolbarIndicatorsChanged
     /// @return A list of QUrl with the indicators (see MainToolBarIndicators.qml)
     virtual const QVariantList& toolBarIndicators(const Vehicle* vehicle);
 
     /// Returns a list of CameraMetaData objects for available cameras on the vehicle.
+    /// TODO: This should go into QGCCameraManager
     virtual const QVariantList& cameraList(const Vehicle* vehicle);
+
+    /// Creates vehicle camera manager. Returns NULL if not supported.
+    virtual QGCCameraManager* createCameraManager(Vehicle *vehicle);
+
+    /// Camera control. Returns NULL if not supported.
+    virtual QGCCameraControl* createCameraControl(const mavlink_camera_information_t* info, Vehicle* vehicle, int compID, QObject* parent = NULL);
 
     /// Returns a pointer to a dictionary of firmware-specific FactGroups
     virtual QMap<QString, FactGroup*>* factGroups(void);
@@ -287,7 +297,10 @@ public:
     virtual bool isVtol(const Vehicle* vehicle) const;
 
     // FIXME: Hack workaround for non pluginize FollowMe support
-    static const char* px4FollowMeFlightMode;
+    static const QString px4FollowMeFlightMode;
+
+signals:
+    void toolbarIndicatorsChanged(void);
 
 protected:
     // Arms the vehicle with validation and retries

@@ -67,8 +67,10 @@ VideoReceiver::VideoReceiver(QObject* parent)
     , _videoSurface(NULL)
     , _videoRunning(false)
     , _showFullScreen(false)
+    , _videoSettings(NULL)
 {
-    _videoSurface  = new VideoSurface;
+    _videoSurface = new VideoSurface;
+    _videoSettings = qgcApp()->toolbox()->settingsManager()->videoSettings();
 #if defined(QGC_GST_STREAMING)
     _setVideoSink(_videoSurface->videoSink());
     _timer.setSingleShot(true);
@@ -126,7 +128,7 @@ newPadCB(GstElement* element, GstPad* pad, gpointer data)
 {
     gchar* name;
     name = gst_pad_get_name(pad);
-    g_print("A new pad %s was created\n", name);
+    //g_print("A new pad %s was created\n", name);
     GstCaps* p_caps = gst_pad_get_pad_template_caps (pad);
     gchar* description = gst_caps_to_string(p_caps);
     qCDebug(VideoReceiverLog) << p_caps << ", " << description;
@@ -147,8 +149,10 @@ VideoReceiver::_connected()
     _timer.stop();
     _socket->deleteLater();
     _socket = NULL;
-    _serverPresent = true;
-    start();
+    if(_videoSettings->streamEnabled()->rawValue().toBool()) {
+        _serverPresent = true;
+        start();
+    }
 }
 #endif
 
@@ -161,7 +165,9 @@ VideoReceiver::_socketError(QAbstractSocket::SocketError socketError)
     _socket->deleteLater();
     _socket = NULL;
     //-- Try again in 5 seconds
-    _timer.start(5000);
+    if(_videoSettings->streamEnabled()->rawValue().toBool()) {
+        _timer.start(5000);
+    }
 }
 #endif
 
@@ -175,18 +181,19 @@ VideoReceiver::_timeout()
         delete _socket;
         _socket = NULL;
     }
-    //-- RTSP will try to connect to the server. If it cannot connect,
-    //   it will simply give up and never try again. Instead, we keep
-    //   attempting a connection on this timer. Once a connection is
-    //   found to be working, only then we actually start the stream.
-    QUrl url(_uri);
-    _socket = new QTcpSocket;
-    _socket->setProxy(QNetworkProxy::NoProxy);
-    connect(_socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error), this, &VideoReceiver::_socketError);
-    connect(_socket, &QTcpSocket::connected, this, &VideoReceiver::_connected);
-    //qCDebug(VideoReceiverLog) << "Trying to connect to:" << url.host() << url.port();
-    _socket->connectToHost(url.host(), url.port());
-    _timer.start(5000);
+    if(_videoSettings->streamEnabled()->rawValue().toBool()) {
+        //-- RTSP will try to connect to the server. If it cannot connect,
+        //   it will simply give up and never try again. Instead, we keep
+        //   attempting a connection on this timer. Once a connection is
+        //   found to be working, only then we actually start the stream.
+        QUrl url(_uri);
+        _socket = new QTcpSocket;
+        _socket->setProxy(QNetworkProxy::NoProxy);
+        connect(_socket, static_cast<void (QTcpSocket::*)(QAbstractSocket::SocketError)>(&QTcpSocket::error), this, &VideoReceiver::_socketError);
+        connect(_socket, &QTcpSocket::connected, this, &VideoReceiver::_connected);
+        _socket->connectToHost(url.host(), url.port());
+        _timer.start(5000);
+    }
 }
 #endif
 
@@ -203,6 +210,11 @@ VideoReceiver::_timeout()
 void
 VideoReceiver::start()
 {
+    if(!_videoSettings->streamEnabled()->rawValue().toBool() ||
+       !_videoSettings->streamConfigured()) {
+        qCDebug(VideoReceiverLog) << "start() but not enabled/configured";
+        return;
+    }
 #if defined(QGC_GST_STREAMING)
     qCDebug(VideoReceiverLog) << "start()";
 
@@ -493,7 +505,7 @@ VideoReceiver::_handleEOS() {
     } else if(_recording && _sink->removing) {
         _shutdownRecordingBranch();
     } else {
-        qCritical() << "VideoReceiver: Unexpected EOS!";
+        qWarning() << "VideoReceiver: Unexpected EOS!";
         _shutdownPipeline();
     }
 }
@@ -549,33 +561,36 @@ VideoReceiver::_onBusMessage(GstBus* bus, GstMessage* msg, gpointer data)
 void
 VideoReceiver::_cleanupOldVideos()
 {
-    QString savePath = qgcApp()->toolbox()->settingsManager()->appSettings()->videoSavePath();
-    QDir videoDir = QDir(savePath);
-    videoDir.setFilter(QDir::Files | QDir::Readable | QDir::NoSymLinks | QDir::Writable);
-    videoDir.setSorting(QDir::Time);
-    //-- All the movie extensions we support
-    QStringList nameFilters;
-    for(uint32_t i = 0; i < NUM_MUXES; i++) {
-        nameFilters << QString("*.") + QString(kVideoExtensions[i]);
-    }
-    videoDir.setNameFilters(nameFilters);
-    //-- get the list of videos stored
-    QFileInfoList vidList = videoDir.entryInfoList();
-    if(!vidList.isEmpty()) {
-        uint64_t total   = 0;
-        //-- Settings are stored using MB
-        uint64_t maxSize = (qgcApp()->toolbox()->settingsManager()->videoSettings()->maxVideoSize()->rawValue().toUInt() * 1024 * 1024);
-        //-- Compute total used storage
-        for(int i = 0; i < vidList.size(); i++) {
-            total += vidList[i].size();
+    //-- Only perform cleanup if storage limit is enabled
+    if(_videoSettings->enableStorageLimit()->rawValue().toBool()) {
+        QString savePath = qgcApp()->toolbox()->settingsManager()->appSettings()->videoSavePath();
+        QDir videoDir = QDir(savePath);
+        videoDir.setFilter(QDir::Files | QDir::Readable | QDir::NoSymLinks | QDir::Writable);
+        videoDir.setSorting(QDir::Time);
+        //-- All the movie extensions we support
+        QStringList nameFilters;
+        for(uint32_t i = 0; i < NUM_MUXES; i++) {
+            nameFilters << QString("*.") + QString(kVideoExtensions[i]);
         }
-        //-- Remove old movies until max size is satisfied.
-        while(total >= maxSize && !vidList.isEmpty()) {
-            total -= vidList.last().size();
-            qCDebug(VideoReceiverLog) << "Removing old video file:" << vidList.last().filePath();
-            QFile file (vidList.last().filePath());
-            file.remove();
-            vidList.removeLast();
+        videoDir.setNameFilters(nameFilters);
+        //-- get the list of videos stored
+        QFileInfoList vidList = videoDir.entryInfoList();
+        if(!vidList.isEmpty()) {
+            uint64_t total   = 0;
+            //-- Settings are stored using MB
+            uint64_t maxSize = (_videoSettings->maxVideoSize()->rawValue().toUInt() * 1024 * 1024);
+            //-- Compute total used storage
+            for(int i = 0; i < vidList.size(); i++) {
+                total += vidList[i].size();
+            }
+            //-- Remove old movies until max size is satisfied.
+            while(total >= maxSize && !vidList.isEmpty()) {
+                total -= vidList.last().size();
+                qCDebug(VideoReceiverLog) << "Removing old video file:" << vidList.last().filePath();
+                QFile file (vidList.last().filePath());
+                file.remove();
+                vidList.removeLast();
+            }
         }
     }
 }
@@ -611,7 +626,7 @@ VideoReceiver::startRecording(void)
         return;
     }
 
-    uint32_t muxIdx = qgcApp()->toolbox()->settingsManager()->videoSettings()->recordingFormat()->rawValue().toUInt();
+    uint32_t muxIdx = _videoSettings->recordingFormat()->rawValue().toUInt();
     if(muxIdx >= NUM_MUXES) {
         qgcApp()->showMessage(tr("Invalid video format defined."));
         return;
@@ -798,16 +813,20 @@ VideoReceiver::_updateTimer()
             }
         }
         if(_videoRunning) {
+            uint32_t timeout = 1;
+            if(qgcApp()->toolbox() && qgcApp()->toolbox()->settingsManager()) {
+                timeout = _videoSettings->rtspTimeout()->rawValue().toUInt();
+            }
             time_t elapsed = 0;
             time_t lastFrame = _videoSurface->lastFrame();
             if(lastFrame != 0) {
                 elapsed = time(0) - _videoSurface->lastFrame();
             }
-            if(elapsed > 2 && _videoSurface) {
+            if(elapsed > (time_t)timeout && _videoSurface) {
                 stop();
             }
         } else {
-            if(!running() && !_uri.isEmpty()) {
+            if(!running() && !_uri.isEmpty() && _videoSettings->streamEnabled()->rawValue().toBool()) {
                 start();
             }
         }

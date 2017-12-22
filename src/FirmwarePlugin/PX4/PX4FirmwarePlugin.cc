@@ -21,6 +21,7 @@
 #include "SensorsComponentController.h"
 #include "PowerComponentController.h"
 #include "RadioComponentController.h"
+#include "QGCCameraManager.h"
 
 #include <QDebug>
 
@@ -123,6 +124,10 @@ PX4FirmwarePlugin::PX4FirmwarePlugin(void)
 
         _flightModeInfoList.append(info);
     }
+}
+
+PX4FirmwarePlugin::~PX4FirmwarePlugin()
+{
 }
 
 AutoPilotPlugin* PX4FirmwarePlugin::autopilotPlugin(Vehicle* vehicle)
@@ -272,7 +277,8 @@ QList<MAV_CMD> PX4FirmwarePlugin::supportedMissionCommands(void)
          << MAV_CMD_DO_MOUNT_CONTROL
          << MAV_CMD_SET_CAMERA_MODE
          << MAV_CMD_IMAGE_START_CAPTURE << MAV_CMD_IMAGE_STOP_CAPTURE << MAV_CMD_VIDEO_START_CAPTURE << MAV_CMD_VIDEO_STOP_CAPTURE
-         << MAV_CMD_NAV_DELAY;
+         << MAV_CMD_NAV_DELAY
+         << MAV_CMD_CONDITION_YAW;
 
     return list;
 }
@@ -378,11 +384,12 @@ void PX4FirmwarePlugin::_mavCommandResult(int vehicleId, int component, int comm
     }
 }
 
-void PX4FirmwarePlugin::guidedModeTakeoff(Vehicle* vehicle)
+void PX4FirmwarePlugin::guidedModeTakeoff(Vehicle* vehicle, double takeoffAltRel)
 {
     QString takeoffAltParam("MIS_TAKEOFF_ALT");
 
-    if (qIsNaN(vehicle->altitudeAMSL()->rawValue().toDouble())) {
+    double vehicleAltitudeAMSL = vehicle->altitudeAMSL()->rawValue().toDouble();
+    if (qIsNaN(vehicleAltitudeAMSL)) {
         qgcApp()->showMessage(tr("Unable to takeoff, vehicle position not known."));
         return;
     }
@@ -391,7 +398,9 @@ void PX4FirmwarePlugin::guidedModeTakeoff(Vehicle* vehicle)
         qgcApp()->showMessage(tr("Unable to takeoff, MIS_TAKEOFF_ALT parameter missing."));
         return;
     }
-    Fact* takeoffAlt = vehicle->parameterManager()->getParameter(FactSystem::defaultComponentId, takeoffAltParam);
+
+    double takeoffAltRelFromVehicle = vehicle->parameterManager()->getParameter(FactSystem::defaultComponentId, takeoffAltParam)->rawValue().toDouble();
+    double takeoffAltAMSL = qMax(takeoffAltRel, takeoffAltRelFromVehicle) + vehicleAltitudeAMSL;
 
     connect(vehicle, &Vehicle::mavCommandResult, this, &PX4FirmwarePlugin::_mavCommandResult);
     vehicle->sendMavCommand(vehicle->defaultComponentId(),
@@ -400,7 +409,7 @@ void PX4FirmwarePlugin::guidedModeTakeoff(Vehicle* vehicle)
                             -1,                             // No pitch requested
                             0, 0,                           // param 2-4 unused
                             NAN, NAN, NAN,                  // No yaw, lat, lon
-                            vehicle->altitudeAMSL()->rawValue().toDouble() + takeoffAlt->rawValue().toDouble());
+                            takeoffAltAMSL);                // AMSL altitude
 }
 
 void PX4FirmwarePlugin::guidedModeGotoLocation(Vehicle* vehicle, const QGeoCoordinate& gotoCoord)
@@ -529,7 +538,7 @@ void PX4FirmwarePlugin::_handleAutopilotVersion(Vehicle* vehicle, mavlink_messag
 
         if (notifyUser) {
             instanceData->versionNotified = true;
-            qgcApp()->showMessage(QString("QGroundControl supports PX4 Pro firmware Version %1.%2.%3 and above. You are using a version prior to that which will lead to unpredictable results. Please upgrade your firmware.").arg(supportedMajorVersion).arg(supportedMinorVersion).arg(supportedPatchVersion));
+            qgcApp()->showMessage(tr("QGroundControl supports PX4 Pro firmware Version %1.%2.%3 and above. You are using a version prior to that which will lead to unpredictable results. Please upgrade your firmware.").arg(supportedMajorVersion).arg(supportedMinorVersion).arg(supportedPatchVersion));
         }
     }
 }
@@ -546,3 +555,15 @@ bool PX4FirmwarePlugin::vehicleYawsToNextWaypointInMission(const Vehicle* vehicl
     }
     return true;
 }
+
+QGCCameraManager* PX4FirmwarePlugin::createCameraManager(Vehicle* vehicle)
+{
+    return new QGCCameraManager(vehicle);
+}
+
+QGCCameraControl* PX4FirmwarePlugin::createCameraControl(const mavlink_camera_information_t* info, Vehicle *vehicle, int compID, QObject* parent)
+{
+    return new QGCCameraControl(info, vehicle, compID, parent);
+}
+
+

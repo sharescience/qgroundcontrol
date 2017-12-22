@@ -47,6 +47,7 @@ public:
     void loadFromVehicle(void);
     
     /// Writes the specified set of mission items to the vehicle
+    /// IMPORTANT NOTE: PlanManager will take control of the MissionItem objects with the missionItems list. It will free them when done.
     ///     @param missionItems Items to send to vehicle
     ///     Signals sendComplete when done
     void writeMissionItems(const QList<MissionItem*>& missionItems);
@@ -112,13 +113,12 @@ protected:
     void _handleMissionItem(const mavlink_message_t& message, bool missionItemInt);
     void _handleMissionRequest(const mavlink_message_t& message, bool missionItemInt);
     void _handleMissionAck(const mavlink_message_t& message);
-    void _handleMissionCurrent(const mavlink_message_t& message);
     void _requestNextMissionItem(void);
     void _clearMissionItems(void);
     void _sendError(ErrorCode_t errorCode, const QString& errorMsg);
     QString _ackTypeToString(AckType_t ackType);
     QString _missionResultToString(MAV_MISSION_RESULT result);
-    void _finishTransaction(bool success);
+    void _finishTransaction(bool success, bool apmGuidedItemWrite = false);
     void _requestList(void);
     void _writeMissionCount(void);
     void _writeMissionItemsWorker(void);

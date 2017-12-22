@@ -37,7 +37,7 @@ QGCView {
     property Fact _appFontPointSize:            QGroundControl.settingsManager.appSettings.appFontPointSize
     property Fact _userBrandImageIndoor:        QGroundControl.settingsManager.brandImageSettings.userBrandImageIndoor
     property Fact _userBrandImageOutdoor:       QGroundControl.settingsManager.brandImageSettings.userBrandImageOutdoor
-    property real _labelWidth:                  ScreenTools.defaultFontPixelWidth * 15
+    property real _labelWidth:                  ScreenTools.defaultFontPixelWidth * 20
     property real _editFieldWidth:              ScreenTools.defaultFontPixelWidth * 30
     property Fact _mapProvider:                 QGroundControl.settingsManager.flightMapSettings.mapProvider
     property Fact _mapType:                     QGroundControl.settingsManager.flightMapSettings.mapType
@@ -296,7 +296,8 @@ QGCView {
                         //-----------------------------------------------------------------
                         //-- Battery talker
                         Row {
-                            spacing: ScreenTools.defaultFontPixelWidth
+                            spacing:    ScreenTools.defaultFontPixelWidth
+                            visible:    QGroundControl.settingsManager.appSettings.batteryPercentRemainingAnnounce.visible
                             QGCCheckBox {
                                 id:                 announcePercentCheckbox
                                 text:               qsTr("Announce battery lower than:")
@@ -360,7 +361,7 @@ QGCView {
                         //-- Save path
                         Row {
                             spacing:    ScreenTools.defaultFontPixelWidth
-                            visible:    _savePath.visible
+                            visible:    _savePath.visible && !ScreenTools.isMobile
 
                             QGCLabel {
                                 anchors.baseline:   savePathBrowse.baseline
@@ -589,13 +590,13 @@ QGCView {
                             spacing:    ScreenTools.defaultFontPixelWidth
                             visible:    QGroundControl.videoManager.isGStreamer && videoSource.currentIndex && videoSource.currentIndex < 3 && QGroundControl.settingsManager.videoSettings.gridLines.visible
                             QGCLabel {
-                                text:               qsTr("Grid Lines:")
+                                text:               qsTr("Disable When Disarmed:")
                                 width:              _labelWidth
                                 anchors.verticalCenter: parent.verticalCenter
                             }
-                            FactComboBox {
-                                width:              _editFieldWidth
-                                fact:               QGroundControl.settingsManager.videoSettings.gridLines
+                            FactCheckBox {
+                                text:                   ""
+                                fact:                   QGroundControl.settingsManager.videoSettings.disableWhenDisarmed
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         }
@@ -629,7 +630,21 @@ QGCView {
                         anchors.centerIn: parent
                         Row {
                             spacing:    ScreenTools.defaultFontPixelWidth
-                            visible:    QGroundControl.videoManager.isGStreamer && videoSource.currentIndex && videoSource.currentIndex < 4 && QGroundControl.settingsManager.videoSettings.maxVideoSize.visible
+                            visible:    QGroundControl.videoManager.isGStreamer && videoSource.currentIndex && videoSource.currentIndex < 4 && QGroundControl.settingsManager.videoSettings.enableStorageLimit.visible
+                            QGCLabel {
+                                text:               qsTr("Auto-Delete Files:")
+                                width:              _labelWidth
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            FactCheckBox {
+                                text:                   ""
+                                fact:                   QGroundControl.settingsManager.videoSettings.enableStorageLimit
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                        Row {
+                            spacing:    ScreenTools.defaultFontPixelWidth
+                            visible:    QGroundControl.videoManager.isGStreamer && videoSource.currentIndex && videoSource.currentIndex < 4 && QGroundControl.settingsManager.videoSettings.maxVideoSize.visible && QGroundControl.settingsManager.videoSettings.enableStorageLimit.value
                             QGCLabel {
                                 text:               qsTr("Max Storage Usage:")
                                 width:              _labelWidth

@@ -34,12 +34,6 @@ public:
     };    
     Q_ENUMS(CameraAction)
 
-    enum CameraMode {
-        CameraModePhoto,
-        CameraModeVideo
-    };
-    Q_ENUMS(CameraMode)
-
     Q_PROPERTY(bool     specifyGimbal                   READ specifyGimbal                  WRITE setSpecifyGimbal              NOTIFY specifyGimbalChanged)
     Q_PROPERTY(Fact*    gimbalPitch                     READ gimbalPitch                                                        CONSTANT)
     Q_PROPERTY(Fact*    gimbalYaw                       READ gimbalYaw                                                          CONSTANT)
@@ -67,6 +61,10 @@ public:
     ///< @return The gimbal yaw specified by this item, NaN if not specified
     double specifiedGimbalYaw(void) const;
 
+    ///< Signals specifiedGimbalPitchChanged
+    ///< @return The gimbal pitch specified by this item, NaN if not specified
+    double specifiedGimbalPitch(void) const;
+
     // Overrides from Section
     bool available          (void) const override { return _available; }
     bool dirty              (void) const override { return _dirty; }
@@ -81,14 +79,17 @@ signals:
     bool specifyGimbalChanged       (bool specifyGimbal);
     bool specifyCameraModeChanged   (bool specifyCameraMode);
     void specifiedGimbalYawChanged  (double gimbalYaw);
+    void specifiedGimbalPitchChanged(double gimbalPitch);
 
 private slots:
     void _setDirty(void);
     void _setDirtyAndUpdateItemCount(void);
     void _updateSpecifiedGimbalYaw(void);
+    void _updateSpecifiedGimbalPitch(void);
     void _specifyChanged(void);
     void _updateSettingsSpecified(void);
     void _cameraActionChanged(void);
+    void _dirtyIfSpecified(void);
 
 private:
     bool _scanGimbal(QmlObjectListModel* visualItems, int scanIndex);
