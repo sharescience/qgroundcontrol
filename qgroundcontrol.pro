@@ -224,7 +224,8 @@ QT += \
     sql \
     svg \
     widgets \
-    xml
+    xml \
+    texttospeech
 
 # Multimedia only used if QVC is enabled
 !contains (DEFINES, QGC_DISABLE_UVC) {
@@ -232,10 +233,12 @@ QT += \
         multimedia
 }
 
-!MobileBuild {
-QT += \
-    printsupport \
-    serialport \
+AndroidBuild || iOSBuild {
+    # Android and iOS don't unclude these
+} else {
+    QT += \
+        printsupport \
+        serialport \
 }
 
 contains(DEFINES, QGC_ENABLE_BLUETOOTH) {
@@ -258,12 +261,6 @@ DebugBuild {
 !iOSBuild {
     CONFIG += console
 }
-}
-
-!MobileBuild {
-# qextserialport should not be used by general QGroundControl code. Use QSerialPort instead. This is only
-# here to support special case Firmware Upgrade code.
-include(libs/qextserialport/src/qextserialport.pri)
 }
 
 #
@@ -333,6 +330,7 @@ INCLUDEPATH += \
     src \
     src/api \
     src/AnalyzeView \
+    src/Camera \
     src/AutoPilotPlugins \
     src/FlightDisplay \
     src/FlightMap \
@@ -349,7 +347,7 @@ INCLUDEPATH += \
     src/Settings \
     src/VehicleSetup \
     src/ViewWidgets \
-    src/audio \
+    src/Audio \
     src/comm \
     src/input \
     src/lib/qmapcontrol \
@@ -390,11 +388,13 @@ FORMS += \
 HEADERS += \
     src/api/QGCCorePlugin.h \
     src/api/QGCOptions.h \
+    src/api/QGCSettings.h \
     src/api/QmlComponentInfo.h \
 
 SOURCES += \
     src/api/QGCCorePlugin.cc \
     src/api/QGCOptions.cc \
+    src/api/QGCSettings.cc \
     src/api/QmlComponentInfo.cc \
 
 #
@@ -409,6 +409,7 @@ DebugBuild { PX4FirmwarePlugin { PX4FirmwarePluginFactory  { APMFirmwarePlugin {
 
     HEADERS += \
         src/AnalyzeView/LogDownloadTest.h \
+        src/Audio/AudioOutputTest.h \
         src/FactSystem/FactSystemTestBase.h \
         src/FactSystem/FactSystemTestGeneric.h \
         src/FactSystem/FactSystemTestPX4.h \
@@ -425,6 +426,7 @@ DebugBuild { PX4FirmwarePlugin { PX4FirmwarePluginFactory  { APMFirmwarePlugin {
         src/MissionManager/SectionTest.h \
         src/MissionManager/SimpleMissionItemTest.h \
         src/MissionManager/SpeedSectionTest.h \
+        src/MissionManager/StructureScanComplexItemTest.h \
         src/MissionManager/SurveyMissionItemTest.h \
         src/MissionManager/VisualMissionItemTest.h \
         src/qgcunittest/FileDialogTest.h \
@@ -444,6 +446,7 @@ DebugBuild { PX4FirmwarePlugin { PX4FirmwarePluginFactory  { APMFirmwarePlugin {
 
     SOURCES += \
         src/AnalyzeView/LogDownloadTest.cc \
+        src/Audio/AudioOutputTest.cc \
         src/FactSystem/FactSystemTestBase.cc \
         src/FactSystem/FactSystemTestGeneric.cc \
         src/FactSystem/FactSystemTestPX4.cc \
@@ -460,6 +463,7 @@ DebugBuild { PX4FirmwarePlugin { PX4FirmwarePluginFactory  { APMFirmwarePlugin {
         src/MissionManager/SectionTest.cc \
         src/MissionManager/SimpleMissionItemTest.cc \
         src/MissionManager/SpeedSectionTest.cc \
+        src/MissionManager/StructureScanComplexItemTest.cc \
         src/MissionManager/SurveyMissionItemTest.cc \
         src/MissionManager/VisualMissionItemTest.cc \
         src/qgcunittest/FileDialogTest.cc \
@@ -483,20 +487,26 @@ DebugBuild { PX4FirmwarePlugin { PX4FirmwarePluginFactory  { APMFirmwarePlugin {
 
 HEADERS += \
     src/AnalyzeView/ExifParser.h \
-    src/AnalyzeView/ULogParser.h \
+    src/AnalyzeView/LogDownloadController.h \
     src/AnalyzeView/PX4LogParser.h \
+    src/AnalyzeView/ULogParser.h \
+    src/Audio/AudioOutput.h \
+    src/Camera/QGCCameraControl.h \
+    src/Camera/QGCCameraIO.h \
+    src/Camera/QGCCameraManager.h \
     src/CmdLineOptParser.h \
     src/FirmwarePlugin/PX4/px4_custom_mode.h \
     src/FlightDisplay/VideoManager.h \
     src/FlightMap/Widgets/ValuesWidgetController.h \
     src/FollowMe/FollowMe.h \
-    src/GAudioOutput.h \
     src/Joystick/Joystick.h \
     src/Joystick/JoystickManager.h \
     src/JsonHelper.h \
     src/LogCompressor.h \
     src/MG.h \
+    src/MissionManager/CameraCalc.h \
     src/MissionManager/CameraSection.h \
+    src/MissionManager/CameraSpec.h \
     src/MissionManager/ComplexMissionItem.h \
     src/MissionManager/FixedWingLandingComplexItem.h \
     src/MissionManager/GeoFenceController.h \
@@ -522,6 +532,7 @@ HEADERS += \
     src/MissionManager/SimpleMissionItem.h \
     src/MissionManager/Section.h \
     src/MissionManager/SpeedSection.h \
+    src/MissionManager/StructureScanComplexItem.h \
     src/MissionManager/SurveyMissionItem.h \
     src/MissionManager/VisualMissionItem.h \
     src/PositionManager/PositionManager.h \
@@ -543,6 +554,7 @@ HEADERS += \
     src/QGCToolbox.h \
     src/QmlControls/AppMessages.h \
     src/QmlControls/CoordinateVector.h \
+    src/QmlControls/EditPositionDialogController.h \
     src/QmlControls/MavlinkQmlSingleton.h \
     src/QmlControls/ParameterEditorController.h \
     src/QmlControls/QGCFileDialogController.h \
@@ -565,7 +577,6 @@ HEADERS += \
     src/Terrain.h \
     src/Vehicle/MAVLinkLogManager.h \
     src/VehicleSetup/JoystickConfigController.h \
-    src/audio/QGCAudioWorker.h \
     src/comm/LinkConfiguration.h \
     src/comm/LinkInterface.h \
     src/comm/LinkManager.h \
@@ -577,7 +588,7 @@ HEADERS += \
     src/uas/UAS.h \
     src/uas/UASInterface.h \
     src/uas/UASMessageHandler.h \
-    src/AnalyzeView/LogDownloadController.h \
+    src/UTM.h \
 
 AndroidBuild {
 HEADERS += \
@@ -666,7 +677,6 @@ HEADERS += \
 
 iOSBuild {
     OBJECTIVE_SOURCES += \
-        src/audio/QGCAudioWorker_iOS.mm \
         src/MobileScreenMgr.mm \
 }
 
@@ -677,18 +687,24 @@ AndroidBuild {
 
 SOURCES += \
     src/AnalyzeView/ExifParser.cc \
-    src/AnalyzeView/ULogParser.cc \
+    src/AnalyzeView/LogDownloadController.cc \
     src/AnalyzeView/PX4LogParser.cc \
+    src/AnalyzeView/ULogParser.cc \
+    src/Audio/AudioOutput.cc \
+    src/Camera/QGCCameraControl.cc \
+    src/Camera/QGCCameraIO.cc \
+    src/Camera/QGCCameraManager.cc \
     src/CmdLineOptParser.cc \
     src/FlightDisplay/VideoManager.cc \
     src/FlightMap/Widgets/ValuesWidgetController.cc \
     src/FollowMe/FollowMe.cc \
-    src/GAudioOutput.cc \
     src/Joystick/Joystick.cc \
     src/Joystick/JoystickManager.cc \
     src/JsonHelper.cc \
     src/LogCompressor.cc \
+    src/MissionManager/CameraCalc.cc \
     src/MissionManager/CameraSection.cc \
+    src/MissionManager/CameraSpec.cc \
     src/MissionManager/ComplexMissionItem.cc \
     src/MissionManager/FixedWingLandingComplexItem.cc \
     src/MissionManager/GeoFenceController.cc \
@@ -713,6 +729,7 @@ SOURCES += \
     src/MissionManager/RallyPointManager.cc \
     src/MissionManager/SimpleMissionItem.cc \
     src/MissionManager/SpeedSection.cc \
+    src/MissionManager/StructureScanComplexItem.cc \
     src/MissionManager/SurveyMissionItem.cc \
     src/MissionManager/VisualMissionItem.cc \
     src/PositionManager/PositionManager.cpp \
@@ -733,6 +750,7 @@ SOURCES += \
     src/QGCToolbox.cc \
     src/QmlControls/AppMessages.cc \
     src/QmlControls/CoordinateVector.cc \
+    src/QmlControls/EditPositionDialogController.cc \
     src/QmlControls/ParameterEditorController.cc \
     src/QmlControls/QGCFileDialogController.cc \
     src/QmlControls/QGCImageProvider.cc \
@@ -754,7 +772,6 @@ SOURCES += \
     src/Terrain.cc \
     src/Vehicle/MAVLinkLogManager.cc \
     src/VehicleSetup/JoystickConfigController.cc \
-    src/audio/QGCAudioWorker.cpp \
     src/comm/LinkConfiguration.cc \
     src/comm/LinkInterface.cc \
     src/comm/LinkManager.cc \
@@ -765,7 +782,7 @@ SOURCES += \
     src/main.cc \
     src/uas/UAS.cc \
     src/uas/UASMessageHandler.cc \
-    src/AnalyzeView/LogDownloadController.cc \
+    src/UTM.cpp \
 
 DebugBuild {
 SOURCES += \

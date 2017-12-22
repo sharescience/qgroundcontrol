@@ -18,6 +18,8 @@
 #include "SimpleMissionItem.h"
 #include "SurveyMissionItem.h"
 #include "FixedWingLandingComplexItem.h"
+#include "StructureScanComplexItem.h"
+#include "StructureScanComplexItem.h"
 #include "JsonHelper.h"
 #include "ParameterManager.h"
 #include "QGroundControlQmlGlobal.h"
@@ -60,8 +62,11 @@ MissionController::MissionController(PlanMasterController* masterController, QOb
     , _itemsRequested(false)
     , _surveyMissionItemName(tr("Survey"))
     , _fwLandingMissionItemName(tr("Fixed Wing Landing"))
+    , _structureScanMissionItemName(tr("Structure Scan"))
     , _appSettings(qgcApp()->toolbox()->settingsManager()->appSettings())
     , _progressPct(0)
+    , _currentPlanViewIndex(-1)
+    , _currentPlanViewItem(NULL)
 {
     _resetMissionFlightStatus();
     managerVehicleChanged(_managerVehicle);
@@ -86,6 +91,7 @@ void MissionController::_resetMissionFlightStatus(void)
     _missionFlightStatus.vehicleSpeed =         _controllerVehicle->multiRotor() || _managerVehicle->vtol() ? _missionFlightStatus.hoverSpeed : _missionFlightStatus.cruiseSpeed;
     _missionFlightStatus.vehicleYaw =           0.0;
     _missionFlightStatus.gimbalYaw =            std::numeric_limits<double>::quiet_NaN();
+    _missionFlightStatus.gimbalPitch =          std::numeric_limits<double>::quiet_NaN();
 
     // Battery information
 
@@ -169,7 +175,7 @@ void MissionController::_newMissionItemsAvailableFromVehicle(bool removeAllReque
 
         for (; i<newMissionItems.count(); i++) {
             const MissionItem* missionItem = newMissionItems[i];
-            newControllerMissionItems->append(new SimpleMissionItem(_controllerVehicle, *missionItem, this));
+            newControllerMissionItems->append(new SimpleMissionItem(_controllerVehicle, _editMode, *missionItem, this));
         }
 
         _deinitAllVisualItems();
@@ -262,11 +268,15 @@ void MissionController::convertToKMLDocument(QDomDocument& document)
 {
     QJsonObject missionJson;
     QmlObjectListModel* visualItems = new QmlObjectListModel();
-    QList<MissionItem*> missionItens;
+    QList<MissionItem*> missionItems;
     QString error;
     save(missionJson);
     _loadItemsFromJson(missionJson, visualItems, error);
-    _convertToMissionItems(visualItems, missionItens, this);
+    _convertToMissionItems(visualItems, missionItems, this);
+
+    if (missionItems.count() == 0) {
+        return;
+    }
 
     float altitude = missionJson[_jsonPlannedHomePositionKey].toArray()[2].toDouble();
 
@@ -274,7 +284,7 @@ void MissionController::convertToKMLDocument(QDomDocument& document)
     QStringList coords;
     // Drop home position
     bool dropPoint = true;
-    for(const auto& item : missionItens) {
+    for(const auto& item : missionItems) {
         if(dropPoint) {
             dropPoint = false;
             continue;
@@ -303,11 +313,8 @@ void MissionController::sendItemsToVehicle(Vehicle* vehicle, QmlObjectListModel*
 
         _convertToMissionItems(visualMissionItems, rgMissionItems, vehicle);
 
+        // PlanManager takes control of MissionItems so no need to delete
         vehicle->missionManager()->writeMissionItems(rgMissionItems);
-
-        for (int i=0; i<rgMissionItems.count(); i++) {
-            rgMissionItems[i]->deleteLater();
-        }
     }
 }
 
@@ -331,7 +338,10 @@ int MissionController::insertSimpleMissionItem(QGeoCoordinate coordinate, int i)
     newItem->setCommand(MavlinkQmlSingleton::MAV_CMD_NAV_WAYPOINT);
     _initVisualItem(newItem);
     if (_visualItems->count() == 1) {
-        newItem->setCommand(_controllerVehicle->vtol() ? MavlinkQmlSingleton::MAV_CMD_NAV_VTOL_TAKEOFF : MavlinkQmlSingleton::MAV_CMD_NAV_TAKEOFF);
+        MavlinkQmlSingleton::Qml_MAV_CMD takeoffCmd = _controllerVehicle->vtol() ? MavlinkQmlSingleton::MAV_CMD_NAV_VTOL_TAKEOFF : MavlinkQmlSingleton::MAV_CMD_NAV_TAKEOFF;
+        if (_controllerVehicle->firmwarePlugin()->supportedMissionCommands().contains((MAV_CMD)takeoffCmd)) {
+            newItem->setCommand(takeoffCmd);
+        }
     }
     newItem->setDefaultsForCommand();
     if ((MAV_CMD)newItem->command() == MAV_CMD_NAV_WAYPOINT) {
@@ -342,6 +352,31 @@ int MissionController::insertSimpleMissionItem(QGeoCoordinate coordinate, int i)
             newItem->missionItem().setFrame(prevFrame);
             newItem->missionItem().setParam7(prevAltitude);
         }
+    }
+    newItem->setMissionFlightStatus(_missionFlightStatus);
+    _visualItems->insert(i, newItem);
+
+    _recalcAll();
+
+    return newItem->sequenceNumber();
+}
+
+int MissionController::insertROIMissionItem(QGeoCoordinate coordinate, int i)
+{
+    int sequenceNumber = _nextSequenceNumber();
+    SimpleMissionItem * newItem = new SimpleMissionItem(_controllerVehicle, this);
+    newItem->setSequenceNumber(sequenceNumber);
+    newItem->setCoordinate(coordinate);
+    newItem->setCommand(MavlinkQmlSingleton::MAV_CMD_DO_SET_ROI);
+    _initVisualItem(newItem);
+    newItem->setDefaultsForCommand();
+
+    double      prevAltitude;
+    MAV_FRAME   prevFrame;
+
+    if (_findPreviousAltitude(i, &prevAltitude, &prevFrame)) {
+        newItem->missionItem().setFrame(prevFrame);
+        newItem->missionItem().setParam7(prevAltitude);
     }
     _visualItems->insert(i, newItem);
 
@@ -367,7 +402,7 @@ int MissionController::insertComplexMissionItem(QString itemName, QGeoCoordinate
         // Set camera to photo mode (leave alone if user already specified)
         if (cameraSection->cameraModeSupported() && !cameraSection->specifyCameraMode()) {
             cameraSection->setSpecifyCameraMode(true);
-            cameraSection->cameraMode()->setRawValue(0);
+            cameraSection->cameraMode()->setRawValue(CAMERA_MODE_IMAGE_SURVEY);
         }
         // Point gimbal straight down
         if (_controllerVehicle->firmwarePlugin()->hasGimbal(_controllerVehicle, rollSupported, pitchSupported, yawSupported) && pitchSupported) {
@@ -379,6 +414,8 @@ int MissionController::insertComplexMissionItem(QString itemName, QGeoCoordinate
         }
     } else if (itemName == _fwLandingMissionItemName) {
         newItem = new FixedWingLandingComplexItem(_controllerVehicle, _visualItems);
+    } else if (itemName == _structureScanMissionItemName) {
+        newItem = new StructureScanComplexItem(_controllerVehicle, _visualItems);
     } else {
         qWarning() << "Internal error: Unknown complex item:" << itemName;
         return sequenceNumber;
@@ -651,6 +688,15 @@ bool MissionController::_loadJsonMissionFileV2(const QJsonObject& json, QmlObjec
                 nextSequenceNumber = landingItem->lastSequenceNumber() + 1;
                 qCDebug(MissionControllerLog) << "FW Landing Pattern load complete: nextSequenceNumber" << nextSequenceNumber;
                 visualItems->append(landingItem);
+            } else if (complexItemType == StructureScanComplexItem::jsonComplexItemTypeValue) {
+                qCDebug(MissionControllerLog) << "Loading Structure Scan: nextSequenceNumber" << nextSequenceNumber;
+                StructureScanComplexItem* structureItem = new StructureScanComplexItem(_controllerVehicle, visualItems);
+                if (!structureItem->load(itemObject, nextSequenceNumber++, errorString)) {
+                    return false;
+                }
+                nextSequenceNumber = structureItem->lastSequenceNumber() + 1;
+                qCDebug(MissionControllerLog) << "Structure Scan load complete: nextSequenceNumber" << nextSequenceNumber;
+                visualItems->append(structureItem);
             } else if (complexItemType == MissionSettingsItem::jsonComplexItemTypeValue) {
                 qCDebug(MissionControllerLog) << "Loading Mission Settings: nextSequenceNumber" << nextSequenceNumber;
                 MissionSettingsItem* settingsItem = new MissionSettingsItem(_controllerVehicle, visualItems);
@@ -756,12 +802,12 @@ bool MissionController::_loadTextMissionFile(QTextStream& stream, QmlObjectListM
                 }
                 firstItem = false;
             } else {
-                errorString = QStringLiteral("The mission file is corrupted.");
+                errorString = tr("The mission file is corrupted.");
                 return false;
             }
         }
     } else {
-        errorString = QStringLiteral("The mission file is not compatible with this version of %1.").arg(qgcApp()->applicationName());
+        errorString = tr("The mission file is not compatible with this version of %1.").arg(qgcApp()->applicationName());
         return false;
     }
 
@@ -972,6 +1018,7 @@ void MissionController::_recalcWaypointLines(void)
     CoordVectHashTable old_table = _linesTable;
     _linesTable.clear();
     _waypointLines.clear();
+    _waypointPath.clear();
 
     bool linkEndToHome;
     SimpleMissionItem* lastItem = _visualItems->value<SimpleMissionItem*>(_visualItems->count() - 1);
@@ -989,25 +1036,37 @@ void MissionController::_recalcWaypointLines(void)
         // If we still haven't found the first coordinate item and we hit a takeoff command, link back to home
         if (firstCoordinateItem &&
                 item->isSimpleItem() &&
-                (qobject_cast<SimpleMissionItem*>(item)->command() == MavlinkQmlSingleton::MAV_CMD_NAV_TAKEOFF ||
-                 qobject_cast<SimpleMissionItem*>(item)->command() == MavlinkQmlSingleton::MAV_CMD_NAV_VTOL_TAKEOFF)) {
+                (!_controllerVehicle->firmwarePlugin()->supportedMissionCommands().contains(MAV_CMD_NAV_TAKEOFF) ||
+                    qobject_cast<SimpleMissionItem*>(item)->command() == MavlinkQmlSingleton::MAV_CMD_NAV_TAKEOFF ||
+                    qobject_cast<SimpleMissionItem*>(item)->command() == MavlinkQmlSingleton::MAV_CMD_NAV_VTOL_TAKEOFF)) {
             linkStartToHome = true;
+            if (!_editMode) {
+                _waypointPath.append(QVariant::fromValue(lastCoordinateItem->coordinate()));
+            }
         }
 
         if (item->specifiesCoordinate()) {
             if (!item->isStandaloneCoordinate()) {
                 firstCoordinateItem = false;
-                VisualItemPair pair(lastCoordinateItem, item);
                 if (lastCoordinateItem != _settingsItem || (showHomePosition && linkStartToHome)) {
-                    _addWaypointLineSegment(old_table, pair);
+                    if (_editMode) {
+                        VisualItemPair pair(lastCoordinateItem, item);
+                        _addWaypointLineSegment(old_table, pair);
+                    } else {
+                        _waypointPath.append(QVariant::fromValue(item->coordinate()));
+                    }
                 }
                 lastCoordinateItem = item;
             }
         }
     }
     if (linkEndToHome && lastCoordinateItem != _settingsItem && showHomePosition) {
-        VisualItemPair pair(lastCoordinateItem, _settingsItem);
-        _addWaypointLineSegment(old_table, pair);
+        if (_editMode) {
+            VisualItemPair pair(lastCoordinateItem, _settingsItem);
+            _addWaypointLineSegment(old_table, pair);
+        } else {
+            _waypointPath.append(QVariant::fromValue(_settingsItem->coordinate()));
+        }
     }
 
     {
@@ -1027,7 +1086,16 @@ void MissionController::_recalcWaypointLines(void)
 
     _recalcMissionFlightStatus();
 
+    if (_waypointPath.count() == 0) {
+        // MapPolyLine has a bug where if you can from a path which has elements to an empty path the line drawn
+        // is not cleared from the map. This hack works around that since it causes the previous lines to be remove
+        // as then doesn't draw anything on the map.
+        _waypointPath.append(QVariant::fromValue(QGeoCoordinate(0, 0)));
+        _waypointPath.append(QVariant::fromValue(QGeoCoordinate(0, 0)));
+    }
+
     emit waypointLinesChanged();
+    emit waypointPathChanged();
 }
 
 void MissionController::_updateBatteryInfo(int waypointIndex)
@@ -1036,6 +1104,9 @@ void MissionController::_updateBatteryInfo(int waypointIndex)
         _missionFlightStatus.hoverAmpsTotal = (_missionFlightStatus.hoverTime / 60.0) * _missionFlightStatus.hoverAmps;
         _missionFlightStatus.cruiseAmpsTotal = (_missionFlightStatus.cruiseTime / 60.0) * _missionFlightStatus.cruiseAmps;
         _missionFlightStatus.batteriesRequired = ceil((_missionFlightStatus.hoverAmpsTotal + _missionFlightStatus.cruiseAmpsTotal) / _missionFlightStatus.ampMinutesAvailable);
+        // FIXME: Battery change point code pretty much doesn't work. The reason is that is treats complex items as a black box. It needs to be able to look
+        // inside complex items in order to determine a swap point that is interior to a complex item. Current the swap point display in PlanToolbar is
+        // disabled to do this problem.
         if (waypointIndex != -1 && _missionFlightStatus.batteriesRequired == 2 && _missionFlightStatus.batteryChangePoint == -1) {
             _missionFlightStatus.batteryChangePoint = waypointIndex - 1;
         }
@@ -1176,12 +1247,13 @@ void MissionController::_recalcMissionFlightStatus()
         }
 
         // Look for gimbal change
-        if (_managerVehicle->vehicleYawsToNextWaypointInMission()) {
-            // We current only support gimbal display in this mode
-            double gimbalYaw = item->specifiedGimbalYaw();
-            if (!qIsNaN(gimbalYaw)) {
-                _missionFlightStatus.gimbalYaw = gimbalYaw;
-            }
+        double gimbalYaw = item->specifiedGimbalYaw();
+        if (!qIsNaN(gimbalYaw)) {
+            _missionFlightStatus.gimbalYaw = gimbalYaw;
+        }
+        double gimbalPitch = item->specifiedGimbalPitch();
+        if (!qIsNaN(gimbalPitch)) {
+            _missionFlightStatus.gimbalPitch = gimbalPitch;
         }
 
         if (i == 0) {
@@ -1460,6 +1532,7 @@ void MissionController::_initVisualItem(VisualMissionItem* visualItem)
     connect(visualItem, &VisualMissionItem::exitCoordinateHasRelativeAltitudeChanged,   this, &MissionController::_recalcWaypointLines);
     connect(visualItem, &VisualMissionItem::specifiedFlightSpeedChanged,                this, &MissionController::_recalcMissionFlightStatus);
     connect(visualItem, &VisualMissionItem::specifiedGimbalYawChanged,                  this, &MissionController::_recalcMissionFlightStatus);
+    connect(visualItem, &VisualMissionItem::specifiedGimbalPitchChanged,                this, &MissionController::_recalcMissionFlightStatus);
     connect(visualItem, &VisualMissionItem::terrainAltitudeChanged,                     this, &MissionController::_recalcMissionFlightStatus);
     connect(visualItem, &VisualMissionItem::lastSequenceNumberChanged,                  this, &MissionController::_recalcSequence);
 
@@ -1475,6 +1548,7 @@ void MissionController::_initVisualItem(VisualMissionItem* visualItem)
         ComplexMissionItem* complexItem = qobject_cast<ComplexMissionItem*>(visualItem);
         if (complexItem) {
             connect(complexItem, &ComplexMissionItem::complexDistanceChanged,       this, &MissionController::_recalcMissionFlightStatus);
+            connect(complexItem, &ComplexMissionItem::greatestDistanceToChanged,    this, &MissionController::_recalcMissionFlightStatus);
             connect(complexItem, &ComplexMissionItem::additionalTimeDelayChanged,   this, &MissionController::_recalcMissionFlightStatus);
         } else {
             qWarning() << "ComplexMissionItem not found";
@@ -1541,10 +1615,9 @@ void MissionController::_managerVehicleHomePositionChanged(const QGeoCoordinate&
         } else {
             qWarning() << "First item is not MissionSettingsItem";
         }
-        if (_visualItems->count() == 1) {
-            // Don't let this trip the dirty bit
-            _visualItems->setDirty(false);
-        }
+        // Don't let this trip the dirty bit. Otherwise plan will keep getting marked dirty if vehicle home
+        // changes.
+        _visualItems->setDirty(false);
     }
 }
 
@@ -1769,6 +1842,9 @@ QStringList MissionController::complexMissionItemNames(void) const
     if (_controllerVehicle->fixedWing()) {
         complexItems.append(_fwLandingMissionItemName);
     }
+    if (_controllerVehicle->multiRotor() || _controllerVehicle->vtol()) {
+        complexItems.append(_structureScanMissionItemName);
+    }
 
     return complexItems;
 }
@@ -1852,5 +1928,35 @@ void MissionController::_managerRemoveAllComplete(bool error)
     if (!error) {
         // Remove all from vehicle so we always update
         showPlanFromManagerVehicle();
+    }
+}
+
+int MissionController::currentPlanViewIndex(void) const
+{
+    return _currentPlanViewIndex;
+}
+
+VisualMissionItem* MissionController::currentPlanViewItem(void) const
+{
+    return _currentPlanViewItem;
+}
+
+void MissionController::setCurrentPlanViewIndex(int sequenceNumber, bool force)
+{
+    if(_visualItems && (force || sequenceNumber != _currentPlanViewIndex)) {
+        _currentPlanViewItem  = NULL;
+        _currentPlanViewIndex = -1;
+        for (int i = 0; i < _visualItems->count(); i++) {
+            VisualMissionItem* pVI = qobject_cast<VisualMissionItem*>(_visualItems->get(i));
+            if (pVI && pVI->sequenceNumber() == sequenceNumber) {
+                pVI->setIsCurrentItem(true);
+                _currentPlanViewItem  = pVI;
+                _currentPlanViewIndex = sequenceNumber;
+            } else {
+                pVI->setIsCurrentItem(false);
+            }
+        }
+        emit currentPlanViewIndexChanged();
+        emit currentPlanViewItemChanged();
     }
 }
