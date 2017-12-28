@@ -680,9 +680,6 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     case MAVLINK_MSG_ID_SCALED_PRESSURE3:
         _handleScaledPressure3(message);
         break;        
-    case MAVLINK_MSG_ID_CAMERA_FEEDBACK:
-        _handleCameraFeedback(message);
-        break;
     case MAVLINK_MSG_ID_CAMERA_IMAGE_CAPTURED:
         _handleCameraImageCaptured(message);
         break;
@@ -697,11 +694,16 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         emit mavlinkSerialControl(ser.device, ser.flags, ser.timeout, ser.baudrate, QByteArray(reinterpret_cast<const char*>(ser.data), ser.count));
     }
         break;
-    // Following are ArduPilot dialect messages
 
+    // Following are ArduPilot dialect messages
+#if !defined(NO_ARDUPILOT_DIALECT)
+    case MAVLINK_MSG_ID_CAMERA_FEEDBACK:
+        _handleCameraFeedback(message);
+        break;
     case MAVLINK_MSG_ID_WIND:
         _handleWind(message);
         break;
+#endif
 #ifndef __mobile__
     case MAVLINK_MSG_ID_ELASTICITY:
         emit mavlinkElasticity(message);
@@ -720,6 +722,7 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
 }
 
 
+#if !defined(NO_ARDUPILOT_DIALECT)
 void Vehicle::_handleCameraFeedback(const mavlink_message_t& message)
 {
     mavlink_camera_feedback_t feedback;
@@ -730,6 +733,7 @@ void Vehicle::_handleCameraFeedback(const mavlink_message_t& message)
     qCDebug(VehicleLog) << "_handleCameraFeedback coord:index" << imageCoordinate << feedback.img_idx;
     _cameraTriggerPoints.append(new QGCQGeoCoordinate(imageCoordinate, this));
 }
+#endif
 
 void Vehicle::_handleCameraImageCaptured(const mavlink_message_t& message)
 {
@@ -1028,6 +1032,7 @@ void Vehicle::_handleWindCov(mavlink_message_t& message)
     _windFactGroup.verticalSpeed()->setRawValue(0);
 }
 
+#if !defined(NO_ARDUPILOT_DIALECT)
 void Vehicle::_handleWind(mavlink_message_t& message)
 {
     mavlink_wind_t wind;
@@ -1037,6 +1042,7 @@ void Vehicle::_handleWind(mavlink_message_t& message)
     _windFactGroup.speed()->setRawValue(wind.speed);
     _windFactGroup.verticalSpeed()->setRawValue(wind.speed_z);
 }
+#endif
 
 void Vehicle::_handleSysStatus(mavlink_message_t& message)
 {
