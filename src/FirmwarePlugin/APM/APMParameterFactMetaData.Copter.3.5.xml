@@ -1559,6 +1559,10 @@
 <field name="Units">m</field>
 <field name="UnitText">meters</field>
 </param>
+<param humanName="ADS-B avoidance minimum altitude" name="AVD_F_ALT_MIN" documentation="Minimum altitude for ADS-B avoidance. If the vehicle is below this altitude, no avoidance action will take place. Useful to prevent ADS-B avoidance from activating while below the tree line or around structures. Default of 0 is no minimum." user="Advanced">
+<field name="Units">m</field>
+<field name="UnitText">meters</field>
+</param>
 </parameters>
 <parameters name="AVOID_">
 <param humanName="Avoidance control enable/disable" name="AVOID_ENABLE" documentation="Enabled/disable stopping at fence" user="Standard">
@@ -8624,7 +8628,7 @@
 <field name="Units">cm/s/s</field>
 <field name="UnitText">centimeters per square second</field>
 </param>
-<param humanName="Use rangefinder for terrain following" name="WPNAV_RFND_USE" documentation="This controls the use of a rangefinder for terrain following" user="Advanced">
+<param humanName="Waypoint missions use rangefinder for terrain following" name="WPNAV_RFND_USE" documentation="This controls if waypoint missions use rangefinder for terrain following" user="Advanced">
 <values>
 <value code="0">Disable</value>
 <value code="1">Enable</value>
