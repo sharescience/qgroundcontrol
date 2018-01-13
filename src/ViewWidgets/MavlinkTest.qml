@@ -22,10 +22,13 @@ import QGroundControl.ScreenTools   1.0
 QGCView {
     viewPanel:  panel
 
-    property real mm      : Math.round(Screen.pixelDensity)
-    property real _margins: 1  * mm
-    property real _Width  : 15 * mm
-    property real _Height : 4  * mm
+    id: mavlinkTest
+    width: Screen.desktopAvailableWidth   * 8 / 15
+    height: Screen.desktopAvailableHeight * 4 / 5
+
+    property real _margins: Screen.desktopAvailableHeight * 0.5 / 100
+    property real _Width  : Screen.desktopAvailableWidth  * 5.5 / 100
+    property real _Height : Screen.desktopAvailableHeight * 2.75 / 100
 
     property real  _max_pwm: 2000
     property real  _min_pwm: 1000
@@ -53,6 +56,10 @@ QGCView {
     MavlinkTestController {
         id:         controller
         factPanel:  panel
+    }
+
+    AutoResize{
+       id:globalResize
     }
 
     QGCPalette { id: palette; colorGroupEnabled: enabled }
@@ -101,6 +108,7 @@ QGCView {
             CheckBox{
                 anchors.top       : _buttonStreamSpeed.bottom
                 anchors.left      : _buttonStreamSpeed.left
+                anchors.topMargin : _margins
 
                 id: _checkboxSR0
                 width : _Width
@@ -118,6 +126,7 @@ QGCView {
             CheckBox{
                 anchors.top       : _checkboxSR0.top
                 anchors.left      : _checkboxSR0.right
+                anchors.leftMargin: _margins
 
                 id: _checkboxSR1
                 width : _Width
@@ -135,6 +144,7 @@ QGCView {
             CheckBox{
                 anchors.top       : _checkboxSR0.bottom
                 anchors.left      : _checkboxSR0.left
+                anchors.topMargin : _margins
 
                 id: _checkboxSR2
                 width : _Width
@@ -152,6 +162,7 @@ QGCView {
             CheckBox{
                 anchors.top       : _checkboxSR2.top
                 anchors.left      : _checkboxSR2.right
+                anchors.leftMargin: _margins
 
                 id: _checkboxSR3
                 width : _Width
@@ -170,6 +181,7 @@ QGCView {
             Label{
                 anchors.top       : _checkboxSR2.bottom
                 anchors.left      : _checkboxSR2.left
+                anchors.topMargin : _margins
 
                 id: _labelRAW_SENS
                 verticalAlignment: Text.AlignVCenter
@@ -181,6 +193,7 @@ QGCView {
                 anchors.verticalCenter: _labelRAW_SENS.verticalCenter
                 anchors.left          : _labelRAW_SENS.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
 
                 id   : _comboboxRAW_SENS
                 width: _Width
@@ -194,6 +207,7 @@ QGCView {
             Label{
                 anchors.top       : _labelRAW_SENS.bottom
                 anchors.left      : _labelRAW_SENS.left
+                anchors.topMargin : _margins
 
                 id: _labelEXT_STAT
                 verticalAlignment: Text.AlignVCenter
@@ -205,6 +219,7 @@ QGCView {
                 anchors.verticalCenter: _labelEXT_STAT.verticalCenter
                 anchors.left          : _labelEXT_STAT.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
 
                 id   : _comboboxEXT_STAT
                 width: _Width
@@ -218,6 +233,7 @@ QGCView {
             Label{
                 anchors.top       : _labelEXT_STAT.bottom
                 anchors.left      : _labelEXT_STAT.left
+                anchors.topMargin : _margins
 
                 id: _labelRC_CHAN
                 verticalAlignment: Text.AlignVCenter
@@ -229,6 +245,7 @@ QGCView {
                 anchors.verticalCenter: _labelRC_CHAN.verticalCenter
                 anchors.left          : _labelRC_CHAN.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
 
                 id   : _comboboxRC_CHAN
                 width: _Width
@@ -242,6 +259,7 @@ QGCView {
             Label{
                 anchors.top       : _labelRC_CHAN.bottom
                 anchors.left      : _labelRC_CHAN.left
+                anchors.topMargin : _margins
 
                 id: _labelRAW_CTRL
                 verticalAlignment: Text.AlignVCenter
@@ -253,6 +271,7 @@ QGCView {
                 anchors.verticalCenter: _labelRAW_CTRL.verticalCenter
                 anchors.left          : _labelRAW_CTRL.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
 
                 id   : _comboboxRAW_CTRL
                 width: _Width
@@ -266,6 +285,7 @@ QGCView {
             Label{
                 anchors.top       : _labelRAW_CTRL.bottom
                 anchors.left      : _labelRAW_CTRL.left
+                anchors.topMargin : _margins
 
                 id: _labelPOSITION
                 verticalAlignment: Text.AlignVCenter
@@ -277,6 +297,7 @@ QGCView {
                 anchors.verticalCenter: _labelPOSITION.verticalCenter
                 anchors.left          : _labelPOSITION.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
 
                 id   : _comboboxPOSITION
                 width: _Width
@@ -290,6 +311,7 @@ QGCView {
             Label{
                 anchors.top       : _labelPOSITION.bottom
                 anchors.left      : _labelPOSITION.left
+                anchors.topMargin : _margins
 
                 id: _labelEXTRA1
                 verticalAlignment: Text.AlignVCenter
@@ -301,6 +323,7 @@ QGCView {
                 anchors.verticalCenter: _labelEXTRA1.verticalCenter
                 anchors.left          : _labelEXTRA1.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
 
                 id   : _comboboxEXTRA1
                 width: _Width
@@ -314,6 +337,7 @@ QGCView {
             Label{
                 anchors.top       : _labelEXTRA1.bottom
                 anchors.left      : _labelEXTRA1.left
+                anchors.topMargin : _margins
 
                 id: _labelEXTRA2
                 verticalAlignment: Text.AlignVCenter
@@ -325,6 +349,7 @@ QGCView {
                 anchors.verticalCenter: _labelEXTRA2.verticalCenter
                 anchors.left          : _labelEXTRA2.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
 
                 id   : _comboboxEXTRA2
                 width: _Width
@@ -338,6 +363,7 @@ QGCView {
             Label{
                 anchors.top       : _labelEXTRA2.bottom
                 anchors.left      : _labelEXTRA2.left
+                anchors.topMargin : _margins
 
                 id: _labelEXTRA3
                 verticalAlignment: Text.AlignVCenter
@@ -349,6 +375,7 @@ QGCView {
                 anchors.verticalCenter: _labelEXTRA3.verticalCenter
                 anchors.left          : _labelEXTRA3.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
 
                 id   : _comboboxEXTRA3
                 width: _Width
@@ -362,6 +389,7 @@ QGCView {
             Label{
                 anchors.top       : _labelEXTRA3.bottom
                 anchors.left      : _labelEXTRA3.left
+                anchors.topMargin : _margins
 
                 id: _labelPARAMS
                 verticalAlignment: Text.AlignVCenter
@@ -373,6 +401,7 @@ QGCView {
                 anchors.verticalCenter: _labelPARAMS.verticalCenter
                 anchors.left          : _labelPARAMS.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
 
                 id   : _comboboxPARAMS
                 width: _Width
@@ -386,6 +415,7 @@ QGCView {
             Label{
                 anchors.top       : _labelPARAMS.bottom
                 anchors.left      : _labelPARAMS.left
+                anchors.topMargin : _margins
 
                 id: _labelADSB
                 verticalAlignment: Text.AlignVCenter
@@ -397,6 +427,7 @@ QGCView {
                 anchors.verticalCenter: _labelADSB.verticalCenter
                 anchors.left          : _labelADSB.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
 
                 id   : _comboboxADSB
                 width: _Width
@@ -410,6 +441,7 @@ QGCView {
             Label{
                 anchors.top       : _labelADSB.bottom
                 anchors.left      : _labelADSB.left
+                anchors.topMargin : _margins
 
                 id: _labelPID
                 verticalAlignment: Text.AlignVCenter
@@ -421,6 +453,8 @@ QGCView {
                 anchors.verticalCenter: _labelPID.verticalCenter
                 anchors.left          : _labelPID.right
                 anchors.leftMargin    : _margins
+                anchors.topMargin     : _margins
+                anchors.bottomMargin  : _margins
 
                 id   : _comboboxPID
                 width: _Width
@@ -435,7 +469,7 @@ QGCView {
         /* Channels Override */
         GroupBox {
             anchors.top       : _groupboxStreamSpeed.top
-            anchors.left      : _groupboxElasticity.right
+            anchors.left      : _groupboxStreamSpeed.right
             anchors.leftMargin: _margins
 
             id: _groupboxChannelsOverride
@@ -1824,7 +1858,7 @@ QGCView {
 
         /* Elasticity */
         GroupBox {
-            anchors.top       : _groupboxStreamSpeed.bottom
+            anchors.top       : _groupboxChannelsOverride.bottom
             anchors.left      : _groupboxStreamSpeed.left
             anchors.topMargin : _margins
 
@@ -2090,9 +2124,9 @@ QGCView {
 
         /* Servos Test */
         GroupBox {
-            anchors.top       : _groupboxElasticity.bottom
-            anchors.left      : _groupboxElasticity.left
-            anchors.topMargin : _margins
+            anchors.top       : _groupboxElasticity.top
+            anchors.left      : _groupboxElasticity.right
+            anchors.leftMargin : _margins
 
             id: _groupboxServosTest
             title: qsTr("Servos Test")

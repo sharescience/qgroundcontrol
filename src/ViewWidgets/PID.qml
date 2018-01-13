@@ -22,10 +22,13 @@ import QGroundControl.ScreenTools   1.0
 QGCView {
     viewPanel:  panel
 
-    property real mm      : Math.round(Screen.pixelDensity)
-    property real _margins: 1  * mm
-    property real _Width  : 15 * mm
-    property real _Height : 4  * mm
+    id: mavlinkTest
+    width: Screen.desktopAvailableWidth   * 1 / 5
+    height: Screen.desktopAvailableHeight * 1 / 2
+
+    property real _margins: Screen.desktopAvailableHeight * 0.5 / 100
+    property real _Width  : Screen.desktopAvailableWidth  * 4.5 / 100
+    property real _Height : Screen.desktopAvailableHeight * 2.75 / 100
 
     property real  _max_pwm: 1900
     property real  _min_pwm: 1100
@@ -53,6 +56,10 @@ QGCView {
     PIDController {
         id:         controller
         factPanel:  panel
+    }
+
+    AutoResize{
+       id:globalResize
     }
 
     QGCPalette { id: palette; colorGroupEnabled: enabled }
@@ -255,12 +262,12 @@ QGCView {
                     id: _checkboxFFEnable
                     width : _Width
                     height: _Height
-                    text: qsTr("Rate Feedforward Enable")
+                    text: qsTr("Feedforward Enable")
                     checkedState:{
                         if(controller.feedforwardEnable){
-                            Qt.Checked
+                            2 // Qt::Checked
                         }else{
-                            Qt.UnChecked
+                            0 // Qt::Unchecked
                         }
                     }
                     onClicked: {

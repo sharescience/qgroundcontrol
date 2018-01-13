@@ -15,7 +15,9 @@ MavlinkTest::MavlinkTest(const QString& title, QAction* action, QWidget *parent)
 {
     Q_UNUSED(title);
     Q_UNUSED(action);
-    //resize(1300, 800);
+    int screenWidth=QApplication::desktop()->width();
+    int screenHeight=QApplication::desktop()->height();
+    this->resize(screenWidth*8/15, screenHeight*4/5);
     setSource(QUrl::fromUserInput("qrc:/qml/MavlinkTest.qml"));
     loadSettings();
 }

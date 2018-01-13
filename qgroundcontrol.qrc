@@ -15,6 +15,7 @@
         <file alias="JoystickIndicator.qml">src/ui/toolbar/JoystickIndicator.qml</file>
     </qresource>
     <qresource prefix="/qml">
+		<file alias="AutoResize.qml">src/ViewWidgets/AutoResize.qml</file>
         <file alias="MavlinkDebug.qml">src/ViewWidgets/MavlinkDebug.qml</file>
         <file alias="MavlinkTest.qml">src/ViewWidgets/MavlinkTest.qml</file>
         <file alias="PID.qml">src/ViewWidgets/PID.qml</file>
