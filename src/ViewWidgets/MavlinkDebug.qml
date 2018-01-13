@@ -22,14 +22,21 @@ import QGroundControl.ScreenTools   1.0
 QGCView {
     viewPanel:  panel
 
-    property real mm      : Math.round(Screen.pixelDensity)
-    property real _margins: 1  * mm
-    property real _Width  : 15 * mm
-    property real _Height : 4  * mm
+    id: mavlinkDebug
+    width: Screen.desktopAvailableWidth   * 1 / 2
+    height: Screen.desktopAvailableHeight * 2 / 3
+
+    property real _margins: Screen.desktopAvailableHeight * 0.5 / 100
+    property real _Width  : Screen.desktopAvailableWidth  * 4.8 / 100
+    property real _Height : Screen.desktopAvailableHeight * 2.2 / 100
 
     MavlinkDebugTransDataController {
         id:         controller
         factPanel:  panel
+    }
+
+    AutoResize{
+       id:globalResize
     }
 
     QGCPalette { id: palette; colorGroupEnabled: enabled }

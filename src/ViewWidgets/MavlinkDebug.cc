@@ -15,7 +15,9 @@ MavlinkDebug::MavlinkDebug(const QString& title, QAction* action, QWidget *paren
 {
     Q_UNUSED(title);
     Q_UNUSED(action);
-    //resize(1050, 850);
+    int screenWidth=QApplication::desktop()->width();
+    int screenHeight=QApplication::desktop()->height();
+    this->resize(screenWidth*1/2, screenHeight*2/3);
     setSource(QUrl::fromUserInput("qrc:/qml/MavlinkDebug.qml"));
     loadSettings();
 }
