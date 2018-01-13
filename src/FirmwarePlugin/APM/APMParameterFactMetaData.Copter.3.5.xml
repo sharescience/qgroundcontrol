@@ -229,7 +229,7 @@
 <field name="Units">cm/s</field>
 <field name="UnitText">centimeters per second</field>
 </param>
-<param humanName="Pilot maximum vertical speed" name="ArduCopter:PILOT_VELZ_MAX" documentation="The maximum vertical velocity the pilot may request in cm/s" user="Standard">
+<param humanName="Pilot maximum vertical speed ascending" name="ArduCopter:PILOT_SPEED_UP" documentation="The maximum vertical ascending velocity the pilot may request in cm/s" user="Standard">
 <field name="Range">50 500</field>
 <field name="Increment">10</field>
 <field name="Units">cm/s</field>
@@ -464,6 +464,7 @@
 <value code="52">Rate Pitch FF</value>
 <value code="53">Rate Roll FF</value>
 <value code="54">Rate Yaw FF</value>
+<value code="57">Winch</value>
 </values>
 </param>
 <param humanName="Tuning minimum" name="ArduCopter:TUNE_LOW" documentation="The minimum value that will be applied to the parameter currently being tuned with the transmitter's channel 6 knob" user="Standard">
@@ -524,6 +525,9 @@
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
 <value code=" 42">SmartRTL</value>
+<value code=" 43">InvertedFlight</value>
+<value code=" 44">Winch Enable</value>
+<value code=" 45">WinchControl</value>
 </values>
 </param>
 <param humanName="Channel 8 option" name="ArduCopter:CH8_OPT" documentation="Select which function is performed when CH8 is above 1800 pwm" user="Standard">
@@ -566,6 +570,9 @@
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
 <value code=" 42">SmartRTL</value>
+<value code=" 43">InvertedFlight</value>
+<value code=" 44">Winch Enable</value>
+<value code=" 45">WinchControl</value>
 </values>
 </param>
 <param humanName="Channel 9 option" name="ArduCopter:CH9_OPT" documentation="Select which function is performed when CH9 is above 1800 pwm" user="Standard">
@@ -608,6 +615,9 @@
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
 <value code=" 42">SmartRTL</value>
+<value code=" 43">InvertedFlight</value>
+<value code=" 44">Winch Enable</value>
+<value code=" 45">WinchControl</value>
 </values>
 </param>
 <param humanName="Channel 10 option" name="ArduCopter:CH10_OPT" documentation="Select which function is performed when CH10 is above 1800 pwm" user="Standard">
@@ -650,6 +660,9 @@
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
 <value code=" 42">SmartRTL</value>
+<value code=" 43">InvertedFlight</value>
+<value code=" 44">Winch Enable</value>
+<value code=" 45">WinchControl</value>
 </values>
 </param>
 <param humanName="Channel 11 option" name="ArduCopter:CH11_OPT" documentation="Select which function is performed when CH11 is above 1800 pwm" user="Standard">
@@ -692,6 +705,9 @@
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
 <value code=" 42">SmartRTL</value>
+<value code=" 43">InvertedFlight</value>
+<value code=" 44">Winch Enable</value>
+<value code=" 45">WinchControl</value>
 </values>
 </param>
 <param humanName="Channel 12 option" name="ArduCopter:CH12_OPT" documentation="Select which function is performed when CH12 is above 1800 pwm" user="Standard">
@@ -734,6 +750,9 @@
 <value code=" 40">Object Avoidance</value>
 <value code=" 41">ArmDisarm</value>
 <value code=" 42">SmartRTL</value>
+<value code=" 43">InvertedFlight</value>
+<value code=" 44">Winch Enable</value>
+<value code=" 45">WinchControl</value>
 </values>
 </param>
 <param humanName="Disarm delay" name="ArduCopter:DISARM_DELAY" documentation="Delay before automatic disarm in seconds. A value of zero disables auto disarm." user="Advanced">
@@ -907,6 +926,7 @@
 <values>
 <value code="3">Auto</value>
 <value code="4">Guided</value>
+<value code="5">LOITER</value>
 <value code="6">RTL</value>
 <value code="9">Land</value>
 <value code="17">Brake</value>
@@ -964,6 +984,12 @@
 <value code=" 12">DodecaHexa</value>
 </values>
 <field name="RebootRequired">True</field>
+</param>
+<param humanName="Pilot maximum vertical speed descending" name="ArduCopter:PILOT_SPEED_DN" documentation="The maximum vertical descending velocity the pilot may request in cm/s" user="Standard">
+<field name="Range">50 500</field>
+<field name="Increment">10</field>
+<field name="Units">cm/s</field>
+<field name="UnitText">centimeters per second</field>
 </param>
 </parameters>
 </vehicles><libraries><parameters name="ADSB_">
@@ -1104,7 +1130,7 @@
 <field name="Range">0.0 1.0</field>
 <field name="Increment">.01</field>
 </param>
-<param humanName="AHRS use GPS for navigation" name="AHRS_GPS_USE" documentation="This controls whether to use dead-reckoning or GPS based navigation. If set to 0 then the GPS won't be used for navigation, and only dead reckoning will be used. A value of zero should never be used for normal flight." user="Advanced">
+<param humanName="AHRS use GPS for navigation" name="AHRS_GPS_USE" documentation="This controls whether to use dead-reckoning or GPS based navigation. If set to 0 then the GPS won't be used for navigation, and only dead reckoning will be used. A value of zero should never be used for normal flight. Currently this affects only the DCM-based AHRS: the EKF uses GPS whenever it is available." user="Advanced">
 <values>
 <value code="0">Disabled</value>
 <value code="1">Enabled</value>
@@ -1209,7 +1235,7 @@
 </values>
 </param>
 <param humanName="Arm Checks to Peform (bitmask)" name="ARMING_CHECK" documentation="Checks prior to arming motor. This is a bitmask of checks that will be performed before allowing arming. The default is no checks, allowing arming at any time. You can select whatever checks you prefer by adding together the values of each check type to set this parameter. For example, to only allow arming when you have GPS lock and no RC failsafe you would set ARMING_CHECK to 72. For most users it is recommended that you set this to 1 to enable all checks." user="Standard">
-<field name="Bitmask">0:All,1:Barometer,2:Compass,3:GPS lock,4:INS,5:Parameters,6:RC,7:Board voltage,8:Battery Level,9:Airspeed,10:Logging Available,11:Hardware safety switch,12:GPS Configuration</field>
+<field name="Bitmask">0:All,1:Barometer,2:Compass,3:GPS lock,4:INS,5:Parameters,6:RC,7:Board voltage,8:Battery Level,10:Logging Available,11:Hardware safety switch,12:GPS Configuration</field>
 <values>
 <value code="0">None</value>
 <value code="1">All</value>
@@ -1221,7 +1247,6 @@
 <value code="64">RC Failsafe</value>
 <value code="128">Board voltage</value>
 <value code="256">Battery Level</value>
-<value code="512">Airspeed</value>
 <value code="1024">LoggingAvailable</value>
 <value code="2048">Hardware safety switch</value>
 <value code="4096">GPS configuration</value>
@@ -1232,12 +1257,12 @@
 <field name="Units">m/s/s</field>
 <field name="UnitText">meters per square second</field>
 </param>
-<param humanName="Arming voltage minimum on the first battery" name="ARMING_VOLT_MIN" documentation="The minimum voltage on the first battery to arm, 0 disables the check" user="Standard">
+<param humanName="Arming voltage minimum on the first battery" name="ARMING_VOLT_MIN" documentation="The minimum voltage of the first battery required to arm, 0 disables the check" user="Standard">
 <field name="Increment">0.1 </field>
 <field name="Units">V</field>
 <field name="UnitText">volt</field>
 </param>
-<param humanName="Arming voltage minimum on the second battery" name="ARMING_VOLT2_MIN" documentation="The minimum voltage on the first battery to arm, 0 disables the check" user="Standard">
+<param humanName="Arming voltage minimum on the second battery" name="ARMING_VOLT2_MIN" documentation="The minimum voltage of the second battery required to arm, 0 disables the check" user="Standard">
 <field name="Increment">0.1 </field>
 <field name="Units">V</field>
 <field name="UnitText">volt</field>
@@ -1772,7 +1797,7 @@
 </values>
 <field name="RebootRequired">True</field>
 </param>
-<param humanName="Target IMU temperature" name="BRD_IMU_TARGTEMP" documentation="This sets the target IMU temperature for boards with controllable IMU heating units. A value of -1 disables heating." user="Advanced">
+<param humanName="Target IMU temperature" name="BRD_IMU_TARGTEMP" documentation="This sets the target IMU temperature for boards with controllable IMU heating units. DO NOT SET -1 on The Cube. A value of -1 sets PH1 behaviour " user="Advanced">
 <field name="Range">-1 80</field>
 <field name="Units">degC</field>
 <field name="UnitText">degrees Celsius</field>
@@ -1944,26 +1969,14 @@
 <value code="1">TriggerHigh</value>
 </values>
 </param>
+<param humanName="Distance-trigging in AUTO mode only" name="CAM_AUTO_ONLY" documentation="When enabled, trigging by distance is done in AUTO mode only." user="Standard">
+<values>
+<value code="0">Always</value>
+<value code="1">Only when in AUTO</value>
+</values>
+</param>
 </parameters>
 <parameters name="CAN_D1_">
-<param humanName="Index of virtual driver to be used with physical CAN interface" name="CAN_D1_DRIVER" documentation="Enabling this option enables use of CAN buses." user="Standard">
-<values>
-<value code="0">Disabled</value>
-<value code="1">First driver</value>
-<value code="2">Second driver</value>
-</values>
-<field name="RebootRequired">True</field>
-</param>
-<param humanName="Bitrate of CAN interface" name="CAN_D1_BITRATE" documentation="Bit rate can be set up to from 10000 to 1000000" user="Advanced">
-<field name="Range">10000 1000000</field>
-</param>
-<param humanName="Level of debug for CAN devices" name="CAN_D1_DEBUG" documentation="Enabling this option will provide debug messages" user="Advanced">
-<values>
-<value code="0">Disabled</value>
-<value code="1">Major messages</value>
-<value code="2">All messages</value>
-</values>
-</param>
 <param humanName="Enable use of specific protocol over virtual driver" name="CAN_D1_PROTOCOL" documentation="Enabling this option starts selected protocol that will use this virtual driver" user="Advanced">
 <values>
 <value code="0">Disabled</value>
@@ -1984,24 +1997,6 @@
 </param>
 </parameters>
 <parameters name="CAN_D2_">
-<param humanName="Index of virtual driver to be used with physical CAN interface" name="CAN_D2_DRIVER" documentation="Enabling this option enables use of CAN buses." user="Standard">
-<values>
-<value code="0">Disabled</value>
-<value code="1">First driver</value>
-<value code="2">Second driver</value>
-</values>
-<field name="RebootRequired">True</field>
-</param>
-<param humanName="Bitrate of CAN interface" name="CAN_D2_BITRATE" documentation="Bit rate can be set up to from 10000 to 1000000" user="Advanced">
-<field name="Range">10000 1000000</field>
-</param>
-<param humanName="Level of debug for CAN devices" name="CAN_D2_DEBUG" documentation="Enabling this option will provide debug messages" user="Advanced">
-<values>
-<value code="0">Disabled</value>
-<value code="1">Major messages</value>
-<value code="2">All messages</value>
-</values>
-</param>
 <param humanName="Enable use of specific protocol over virtual driver" name="CAN_D2_PROTOCOL" documentation="Enabling this option starts selected protocol that will use this virtual driver" user="Advanced">
 <values>
 <value code="0">Disabled</value>
@@ -2022,24 +2017,6 @@
 </param>
 </parameters>
 <parameters name="CAN_D3_">
-<param humanName="Index of virtual driver to be used with physical CAN interface" name="CAN_D3_DRIVER" documentation="Enabling this option enables use of CAN buses." user="Standard">
-<values>
-<value code="0">Disabled</value>
-<value code="1">First driver</value>
-<value code="2">Second driver</value>
-</values>
-<field name="RebootRequired">True</field>
-</param>
-<param humanName="Bitrate of CAN interface" name="CAN_D3_BITRATE" documentation="Bit rate can be set up to from 10000 to 1000000" user="Advanced">
-<field name="Range">10000 1000000</field>
-</param>
-<param humanName="Level of debug for CAN devices" name="CAN_D3_DEBUG" documentation="Enabling this option will provide debug messages" user="Advanced">
-<values>
-<value code="0">Disabled</value>
-<value code="1">Major messages</value>
-<value code="2">All messages</value>
-</values>
-</param>
 <param humanName="Enable use of specific protocol over virtual driver" name="CAN_D3_PROTOCOL" documentation="Enabling this option starts selected protocol that will use this virtual driver" user="Advanced">
 <values>
 <value code="0">Disabled</value>
@@ -2078,24 +2055,6 @@
 <value code="2">All messages</value>
 </values>
 </param>
-<param humanName="Enable use of specific protocol over virtual driver" name="CAN_P1_PROTOCOL" documentation="Enabling this option starts selected protocol that will use this virtual driver" user="Advanced">
-<values>
-<value code="0">Disabled</value>
-<value code="1">UAVCAN</value>
-</values>
-<field name="RebootRequired">True</field>
-</param>
-</parameters>
-<parameters name="CAN_P1_UC_">
-<param humanName="UAVCAN node that is used for this network" name="CAN_P1_UC_NODE" documentation="UAVCAN node should be set implicitly" user="Advanced">
-<field name="Range">1 250</field>
-</param>
-<param humanName="RC Out channels to be transmitted as servo over UAVCAN" name="CAN_P1_UC_SRV_BM" documentation="Bitmask with one set for channel to be transmitted as a servo command over UAVCAN" user="Advanced">
-<field name="Bitmask">0: Servo 1, 1: Servo 2, 2: Servo 3, 3: Servo 4, 4: Servo 5, 5: Servo 6, 6: Servo 7, 7: Servo 8, 8: Servo 9, 9: Servo 10, 10: Servo 11, 11: Servo 12, 12: Servo 13, 13: Servo 14, 14: Servo 15</field>
-</param>
-<param humanName="RC Out channels to be transmitted as ESC over UAVCAN" name="CAN_P1_UC_ESC_BM" documentation="Bitmask with one set for channel to be transmitted as a ESC command over UAVCAN" user="Advanced">
-<field name="Bitmask">0: ESC 1, 1: ESC 2, 2: ESC 3, 3: ESC 4, 4: ESC 5, 5: ESC 6, 6: ESC 7, 7: ESC 8, 8: ESC 9, 9: ESC 10, 10: ESC 11, 11: ESC 12, 12: ESC 13, 13: ESC 14, 14: ESC 15, 15: ESC 16</field>
-</param>
 </parameters>
 <parameters name="CAN_P2_">
 <param humanName="Index of virtual driver to be used with physical CAN interface" name="CAN_P2_DRIVER" documentation="Enabling this option enables use of CAN buses." user="Standard">
@@ -2116,24 +2075,6 @@
 <value code="2">All messages</value>
 </values>
 </param>
-<param humanName="Enable use of specific protocol over virtual driver" name="CAN_P2_PROTOCOL" documentation="Enabling this option starts selected protocol that will use this virtual driver" user="Advanced">
-<values>
-<value code="0">Disabled</value>
-<value code="1">UAVCAN</value>
-</values>
-<field name="RebootRequired">True</field>
-</param>
-</parameters>
-<parameters name="CAN_P2_UC_">
-<param humanName="UAVCAN node that is used for this network" name="CAN_P2_UC_NODE" documentation="UAVCAN node should be set implicitly" user="Advanced">
-<field name="Range">1 250</field>
-</param>
-<param humanName="RC Out channels to be transmitted as servo over UAVCAN" name="CAN_P2_UC_SRV_BM" documentation="Bitmask with one set for channel to be transmitted as a servo command over UAVCAN" user="Advanced">
-<field name="Bitmask">0: Servo 1, 1: Servo 2, 2: Servo 3, 3: Servo 4, 4: Servo 5, 5: Servo 6, 6: Servo 7, 7: Servo 8, 8: Servo 9, 9: Servo 10, 10: Servo 11, 11: Servo 12, 12: Servo 13, 13: Servo 14, 14: Servo 15</field>
-</param>
-<param humanName="RC Out channels to be transmitted as ESC over UAVCAN" name="CAN_P2_UC_ESC_BM" documentation="Bitmask with one set for channel to be transmitted as a ESC command over UAVCAN" user="Advanced">
-<field name="Bitmask">0: ESC 1, 1: ESC 2, 2: ESC 3, 3: ESC 4, 4: ESC 5, 5: ESC 6, 6: ESC 7, 7: ESC 8, 8: ESC 9, 9: ESC 10, 10: ESC 11, 11: ESC 12, 12: ESC 13, 13: ESC 14, 14: ESC 15, 15: ESC 16</field>
-</param>
 </parameters>
 <parameters name="CAN_P3_">
 <param humanName="Index of virtual driver to be used with physical CAN interface" name="CAN_P3_DRIVER" documentation="Enabling this option enables use of CAN buses." user="Standard">
@@ -2153,24 +2094,6 @@
 <value code="1">Major messages</value>
 <value code="2">All messages</value>
 </values>
-</param>
-<param humanName="Enable use of specific protocol over virtual driver" name="CAN_P3_PROTOCOL" documentation="Enabling this option starts selected protocol that will use this virtual driver" user="Advanced">
-<values>
-<value code="0">Disabled</value>
-<value code="1">UAVCAN</value>
-</values>
-<field name="RebootRequired">True</field>
-</param>
-</parameters>
-<parameters name="CAN_P3_UC_">
-<param humanName="UAVCAN node that is used for this network" name="CAN_P3_UC_NODE" documentation="UAVCAN node should be set implicitly" user="Advanced">
-<field name="Range">1 250</field>
-</param>
-<param humanName="RC Out channels to be transmitted as servo over UAVCAN" name="CAN_P3_UC_SRV_BM" documentation="Bitmask with one set for channel to be transmitted as a servo command over UAVCAN" user="Advanced">
-<field name="Bitmask">0: Servo 1, 1: Servo 2, 2: Servo 3, 3: Servo 4, 4: Servo 5, 5: Servo 6, 6: Servo 7, 7: Servo 8, 8: Servo 9, 9: Servo 10, 10: Servo 11, 11: Servo 12, 12: Servo 13, 13: Servo 14, 14: Servo 15</field>
-</param>
-<param humanName="RC Out channels to be transmitted as ESC over UAVCAN" name="CAN_P3_UC_ESC_BM" documentation="Bitmask with one set for channel to be transmitted as a ESC command over UAVCAN" user="Advanced">
-<field name="Bitmask">0: ESC 1, 1: ESC 2, 2: ESC 3, 3: ESC 4, 4: ESC 5, 5: ESC 6, 6: ESC 7, 7: ESC 8, 8: ESC 9, 9: ESC 10, 10: ESC 11, 11: ESC 12, 12: ESC 13, 13: ESC 14, 14: ESC 15, 15: ESC 16</field>
 </param>
 </parameters>
 <parameters name="CHUTE_">
@@ -2666,6 +2589,7 @@
 <value code=" 2">Use GPS</value>
 <value code=" 3">Use Range Beacon</value>
 </values>
+<field name="RebootRequired">True</field>
 </param>
 <param humanName="Altitude measurement noise (m)" name="EK2_ALT_M_NSE" documentation="This is the RMS value of noise in the altitude measurement. Increasing it reduces the weighting of the baro measurement and will make the filter respond more slowly to baro measurement errors, but will make it more sensitive to GPS and accelerometer errors." user="Advanced">
 <field name="Range">0.1 10.0</field>
@@ -3538,11 +3462,12 @@
 <value code="-256">External only (0xFF00)</value>
 </values>
 </param>
-<param humanName="Raw data logging" name="GPS_RAW_DATA" documentation="Enable logging of RXM raw data from uBlox which includes carrier phase and pseudo range information. This allows for post processing of dataflash logs for more precise positioning. Note that this requires a raw capable uBlox such as the 6P or 6T." user="Advanced">
+<param humanName="Raw data logging" name="GPS_RAW_DATA" documentation="Handles logging raw data; on uBlox chips that support raw data this will log RXM messages into dataflash log; on Septentrio this will log on the equipment's SD card and when set to 2, the autopilot will try to stop logging after disarming and restart after arming" user="Advanced">
 <values>
-<value code="0">Disabled</value>
-<value code="1">log every sample</value>
-<value code="5">log every 5 samples</value>
+<value code="0">Ignore</value>
+<value code="1">Always log</value>
+<value code="2">Stop logging when disarmed (SBF only)</value>
+<value code="5">Only log every five samples (uBlox only)</value>
 </values>
 <field name="RebootRequired">True</field>
 </param>
@@ -4211,7 +4136,41 @@
 </param>
 <param humanName="Fast sampling mask" name="INS_FAST_SAMPLE" documentation="Mask of IMUs to enable fast sampling on, if available" user="Advanced">
 </param>
-<param humanName="Notch filter" name="INS_NOTCH_" documentation="Gyro notch filter" user="Advanced">
+</parameters>
+<parameters name="INS_LOG_">
+<param humanName="sample count per batch" name="INS_LOG_BAT_CNT" documentation="Number of samples to take when logging streams of IMU sensor readings.  Will be rounded down to a multiple of 32." user="Advanced">
+<field name="Increment">32</field>
+</param>
+<param humanName="Sensor Bitmask" name="INS_LOG_BAT_MASK" documentation="Bitmap of which IMUs to log batch data for" user="Advanced">
+<field name="Bitmask">0:IMU1,1:IMU2,2:IMU3</field>
+<values>
+<value code="0">None</value>
+<value code="1">First IMU</value>
+<value code="255">All</value>
+</values>
+</param>
+</parameters>
+<parameters name="INS_NOTCH_">
+<param humanName="Enable" name="INS_NOTCH_ENABLE" documentation="Enable notch filter" user="Advanced">
+<values>
+<value code="0">Disabled</value>
+<value code="1">Enabled</value>
+</values>
+</param>
+<param humanName="Frequency" name="INS_NOTCH_FREQ" documentation="Notch center frequency in Hz" user="Advanced">
+<field name="Range">10 200</field>
+<field name="Units">Hz</field>
+<field name="UnitText">hertz</field>
+</param>
+<param humanName="Bandwidth" name="INS_NOTCH_BW" documentation="Notch bandwidth in Hz" user="Advanced">
+<field name="Range">5 50</field>
+<field name="Units">Hz</field>
+<field name="UnitText">hertz</field>
+</param>
+<param humanName="Attenuation" name="INS_NOTCH_ATT" documentation="Notch attenuation in dB" user="Advanced">
+<field name="Range">5 30</field>
+<field name="Units">dB</field>
+<field name="UnitText">decibel</field>
 </param>
 </parameters>
 <parameters name="LGR_">
@@ -6221,6 +6180,8 @@
 <value code=" 11">Lidar360</value>
 <value code=" 12">Aerotenna uLanding</value>
 <value code=" 13">Beacon</value>
+<value code=" 14">Volz servo out</value>
+<value code=" 15">SBus servo out</value>
 </values>
 <field name="RebootRequired">True</field>
 </param>
@@ -6255,6 +6216,8 @@
 <value code=" 11">Lidar360</value>
 <value code=" 12">Aerotenna uLanding</value>
 <value code=" 13">Beacon</value>
+<value code=" 14">Volz servo out</value>
+<value code=" 15">SBus servo out</value>
 </values>
 <field name="RebootRequired">True</field>
 </param>
@@ -6289,6 +6252,8 @@
 <value code=" 11">Lidar360</value>
 <value code=" 12">Aerotenna uLanding</value>
 <value code=" 13">Beacon</value>
+<value code=" 14">Volz servo out</value>
+<value code=" 15">SBus servo out</value>
 </values>
 <field name="RebootRequired">True</field>
 </param>
@@ -6323,6 +6288,8 @@
 <value code=" 11">Lidar360</value>
 <value code=" 12">Aerotenna uLanding</value>
 <value code=" 13">Beacon</value>
+<value code=" 14">Volz servo out</value>
+<value code=" 15">SBus servo out</value>
 </values>
 <field name="RebootRequired">True</field>
 </param>
@@ -6357,6 +6324,8 @@
 <value code=" 11">Lidar360</value>
 <value code=" 12">Aerotenna uLanding</value>
 <value code=" 13">Beacon</value>
+<value code=" 14">Volz servo out</value>
+<value code=" 15">SBus servo out</value>
 </values>
 <field name="RebootRequired">True</field>
 </param>
@@ -6491,6 +6460,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -6595,6 +6565,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -6699,6 +6670,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -6803,6 +6775,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -6907,6 +6880,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -7011,6 +6985,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -7115,6 +7090,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -7219,6 +7195,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -7323,6 +7300,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -7427,6 +7405,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -7531,6 +7510,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -7635,6 +7615,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -7739,6 +7720,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -7843,6 +7825,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -7947,6 +7930,7 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
 </param>
 </parameters>
@@ -8051,7 +8035,20 @@
 <value code="83">Motor10</value>
 <value code="84">Motor11</value>
 <value code="85">Motor12</value>
+<value code="88">Winch</value>
 </values>
+</param>
+</parameters>
+<parameters name="SERVO_SBUS_">
+<param humanName="SBUS default output rate" name="SERVO_SBUS_RATE" documentation="This sets the SBUS output frame rate in Hz." user="Advanced">
+<field name="Range">25 250</field>
+<field name="Units">Hz</field>
+<field name="UnitText">hertz</field>
+</param>
+</parameters>
+<parameters name="SERVO_VOLZ_">
+<param humanName="Channel Bitmask" name="SERVO_VOLZ_MASK" documentation="Enable of volz servo protocol to specific channels" user="Standard">
+<field name="Bitmask">0:Channel1,1:Channel2,2:Channel3,3:Channel4,4:Channel5,5:Channel6,6:Channel7,7:Channel8,8:Channel9,9:Channel10,10:Channel11,11:Channel12,12:Channel13,13:Channel14,14:Channel15,15:Channel16</field>
 </param>
 </parameters>
 <parameters name="SPRAY_">
@@ -8426,6 +8423,144 @@
 <value code=" 24">Up</value>
 <value code=" 25">Down</value>
 </values>
+</param>
+</parameters>
+<parameters name="WENC">
+<param humanName="WheelEncoder type" name="WENC_TYPE" documentation="What type of WheelEncoder is connected" user="Standard">
+<values>
+<value code="0">None</value>
+<value code="1">Quadrature</value>
+</values>
+</param>
+<param humanName="WheelEncoder counts per revolution" name="WENC_CPR" documentation="WheelEncoder counts per full revolution of the wheel" user="Standard">
+<field name="Increment">1</field>
+</param>
+<param humanName="Wheel radius in meters" name="WENC_RADIUS" documentation="Wheel radius in meters" user="Standard">
+<field name="Increment">0.001</field>
+</param>
+<param humanName="Wheel's X position offset" name="WENC_POS_X" documentation="X position of the center of the wheel in body frame. Positive X is forward of the origin." user="Advanced">
+<field name="Increment">0.01</field>
+<field name="Units">m</field>
+<field name="UnitText">meters</field>
+</param>
+<param humanName="Wheel's Y position offset" name="WENC_POS_Y" documentation="Y position of the center of the wheel in body frame. Positive Y is to the right of the origin." user="Advanced">
+<field name="Increment">0.01</field>
+<field name="Units">m</field>
+<field name="UnitText">meters</field>
+</param>
+<param humanName="Wheel's Z position offset" name="WENC_POS_Z" documentation="Z position of the center of the wheel in body frame. Positive Z is down from the origin." user="Advanced">
+<field name="Increment">0.01</field>
+<field name="Units">m</field>
+<field name="UnitText">meters</field>
+</param>
+<param humanName="Input Pin A" name="WENC_PINA" documentation="Input Pin A" user="Standard">
+<values>
+<value code="-1">Disabled</value>
+<value code="50">PixhawkAUX1</value>
+<value code="51">PixhawkAUX2</value>
+<value code="52">PixhawkAUX3</value>
+<value code="53">PixhawkAUX4</value>
+<value code="54">PixhawkAUX5</value>
+<value code="55">PixhawkAUX6</value>
+</values>
+</param>
+<param humanName="Input Pin B" name="WENC_PINB" documentation="Input Pin B" user="Standard">
+<values>
+<value code="-1">Disabled</value>
+<value code="50">PixhawkAUX1</value>
+<value code="51">PixhawkAUX2</value>
+<value code="52">PixhawkAUX3</value>
+<value code="53">PixhawkAUX4</value>
+<value code="54">PixhawkAUX5</value>
+<value code="55">PixhawkAUX6</value>
+</values>
+</param>
+<param humanName="Second WheelEncoder type" name="WENC2_TYPE" documentation="What type of WheelEncoder sensor is connected" user="Standard">
+<values>
+<value code="0">None</value>
+<value code="1">Quadrature</value>
+</values>
+</param>
+<param humanName="WheelEncoder 2 counts per revolution" name="WENC2_CPR" documentation="WheelEncoder 2 counts per full revolution of the wheel" user="Standard">
+<field name="Increment">1</field>
+</param>
+<param humanName="Wheel2's radius in meters" name="WENC2_RADIUS" documentation="Wheel2's radius in meters" user="Standard">
+<field name="Increment">0.001</field>
+</param>
+<param humanName="Wheel2's X position offset" name="WENC2_POS_X" documentation="X position of the center of the second wheel in body frame. Positive X is forward of the origin." user="Advanced">
+<field name="Increment">0.01</field>
+<field name="Units">m</field>
+<field name="UnitText">meters</field>
+</param>
+<param humanName="Wheel2's Y position offset" name="WENC2_POS_Y" documentation="Y position of the center of the second wheel in body frame. Positive Y is to the right of the origin." user="Advanced">
+<field name="Increment">0.01</field>
+<field name="Units">m</field>
+<field name="UnitText">meters</field>
+</param>
+<param humanName="Wheel2's Z position offset" name="WENC2_POS_Z" documentation="Z position of the center of the second wheel in body frame. Positive Z is down from the origin." user="Advanced">
+<field name="Increment">0.01</field>
+<field name="Units">m</field>
+<field name="UnitText">meters</field>
+</param>
+<param humanName="Second Encoder Input Pin A" name="WENC2_PINA" documentation="Second Encoder Input Pin A" user="Standard">
+<values>
+<value code="-1">Disabled</value>
+<value code="50">PixhawkAUX1</value>
+<value code="51">PixhawkAUX2</value>
+<value code="52">PixhawkAUX3</value>
+<value code="53">PixhawkAUX4</value>
+<value code="54">PixhawkAUX5</value>
+<value code="55">PixhawkAUX6</value>
+</values>
+</param>
+<param humanName="Second Encoder Input Pin B" name="WENC2_PINB" documentation="Second Encoder Input Pin B" user="Standard">
+<values>
+<value code="-1">Disabled</value>
+<value code="50">PixhawkAUX1</value>
+<value code="51">PixhawkAUX2</value>
+<value code="52">PixhawkAUX3</value>
+<value code="53">PixhawkAUX4</value>
+<value code="54">PixhawkAUX5</value>
+<value code="55">PixhawkAUX6</value>
+</values>
+</param>
+</parameters>
+<parameters name="WINCH_">
+<param humanName="Winch enable/disable" name="WINCH_ENABLE" documentation="Winch enable/disable" user="Standard">
+<values>
+<value code="0">Disabled</value>
+<value code=" 1">Enabled</value>
+</values>
+</param>
+<param humanName="Winch Type" name="WINCH_TYPE" documentation="Winch Type" user="Standard">
+<values>
+<value code="1">Servo with encoder</value>
+</values>
+</param>
+<param humanName="Winch deploy or retract rate maximum" name="WINCH__RATE_MAX" documentation="Winch deploy or retract rate maximum.  Set to maximum rate with no load." user="Standard">
+<field name="Range">0 10</field>
+<field name="Units">m/s</field>
+<field name="UnitText">meters per second</field>
+</param>
+<param humanName="Winch control position error P gain" name="WINCH__POS_P" documentation="Winch control position error P gain" user="Standard">
+<field name="Range">0.01 10.0</field>
+</param>
+<param humanName="Winch control rate P gain" name="WINCH__RATE_P" documentation="Winch control rate P gain.  Converts rate error (in radians/sec) to pwm output (in the range -1 to +1)" user="Standard">
+<field name="Range">0.100 2.000</field>
+</param>
+<param humanName="Winch control I gain" name="WINCH__RATE_I" documentation="Winch control I gain.  Corrects long term error between the desired rate (in rad/s) and actual" user="Standard">
+<field name="Range">0.000 2.000</field>
+</param>
+<param humanName="Winch control I gain maximum" name="WINCH__RATE_IMAX" documentation="Winch control I gain maximum.  Constrains the output (range -1 to +1) that the I term will generate" user="Standard">
+<field name="Range">0.000 1.000</field>
+</param>
+<param humanName="Winch control D gain" name="WINCH__RATE_D" documentation="Winch control D gain.  Compensates for short-term change in desired rate vs actual" user="Standard">
+<field name="Range">0.000 0.400</field>
+</param>
+<param humanName="Winch control filter frequency" name="WINCH__RATE_FILT" documentation="Winch control input filter.  Lower values reduce noise but add delay." user="Standard">
+<field name="Range">1.000 100.000</field>
+<field name="Units">Hz</field>
+<field name="UnitText">hertz</field>
 </param>
 </parameters>
 <parameters name="WPNAV_">
