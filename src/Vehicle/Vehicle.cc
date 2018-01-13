@@ -2082,6 +2082,11 @@ void Vehicle::setConnectionLostEnabled(bool connectionLostEnabled)
 
 void Vehicle::_connectionLostTimeout(void)
 {
+    if (highLatencyLink()) {
+        // No connection timeout on high latency links
+        return;
+    }
+
     if (_connectionLostEnabled && !_connectionLost) {
         _connectionLost = true;
         _heardFrom = false;

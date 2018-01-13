@@ -27,7 +27,7 @@
 class FactMetaData : public QObject
 {
     Q_OBJECT
-    
+
 public:
     typedef enum {
         valueTypeUint8,
@@ -45,7 +45,7 @@ public:
     } ValueType_t;
 
     typedef QVariant (*Translator)(const QVariant& from);
-    
+
     FactMetaData(QObject* parent = NULL);
     FactMetaData(ValueType_t type, QObject* parent = NULL);
     FactMetaData(ValueType_t type, const QString name, QObject* parent = NULL);
@@ -76,6 +76,9 @@ public:
     /// Returns the string for distance units which has configued by user
     static QString appSettingsAreaUnitsString(void);
 
+    static const QString defaultCategory    ();
+    static const QString defaultGroup       ();
+
     int             decimalPlaces           (void) const;
     QVariant        rawDefaultValue         (void) const;
     QVariant        cookedDefaultValue      (void) const { return _rawTranslator(rawDefaultValue()); }
@@ -101,6 +104,7 @@ public:
     bool            rebootRequired          (void) const { return _rebootRequired; }
     bool            hasControl              (void) const { return _hasControl; }
     bool            readOnly                (void) const { return _readOnly; }
+    bool            volatileValue           (void) const { return _volatile; }
 
     /// Amount to increment value when used in controls such as spin button or slider with detents.
     /// NaN for no increment available.
@@ -131,6 +135,7 @@ public:
     void setIncrement       (double increment)                  { _increment = increment; }
     void setHasControl      (bool bValue)                       { _hasControl = bValue; }
     void setReadOnly        (bool bValue)                       { _readOnly = bValue; }
+    void setVolatileValue   (bool bValue);
 
     void setTranslators(Translator rawTranslator, Translator cookedTranslator);
 
@@ -159,9 +164,6 @@ public:
 
     static ValueType_t stringToType(const QString& typeString, bool& unknownType);
     static size_t typeToSize(ValueType_t type);
-
-    static const QString defaultCategory;
-    static const QString defaultGroup;
 
 private:
     QVariant _minForType(void) const;
@@ -239,6 +241,7 @@ private:
     double          _increment;
     bool            _hasControl;
     bool            _readOnly;
+    bool            _volatile;
 
     // Exact conversion constants
     static const struct UnitConsts_s {
