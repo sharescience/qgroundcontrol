@@ -159,7 +159,7 @@ void SurveyMissionItem::_setSurveyDistance(double surveyDistance)
 {
     if (!qFuzzyCompare(_surveyDistance, surveyDistance)) {
         _surveyDistance = surveyDistance;
-        emit complexDistanceChanged(_surveyDistance);
+        emit complexDistanceChanged();
     }
 }
 
@@ -742,7 +742,7 @@ void SurveyMissionItem::_generateGrid(void)
     if (_hoverAndCaptureEnabled()) {
         _additionalFlightDelaySeconds = cameraShots * _hoverAndCaptureDelaySeconds;
     }
-    emit additionalTimeDelayChanged(_additionalFlightDelaySeconds);
+    emit additionalTimeDelayChanged();
 
     emit gridPointsChanged();
 
@@ -940,7 +940,7 @@ int SurveyMissionItem::_gridGenerator(const QList<QPointF>& polygonPoints,  QLis
     // Transects are generated to be as long as the largest width/height of the bounding rect plus some fudge factor.
     // This way they will always be guaranteed to intersect with a polygon edge no matter what angle they are rotated to.
     // They are initially generated with the transects flowing from west to east and then points within the transect north to south.
-    double maxWidth = qMax(boundingRect.width(), boundingRect.height()) + 100.0;
+    double maxWidth = qMax(boundingRect.width(), boundingRect.height()) + 2000.0;
     double halfWidth = maxWidth / 2.0;
     double transectX = boundingCenter.x() - halfWidth;
     double transectXMax = transectX + maxWidth;
