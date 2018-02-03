@@ -227,7 +227,7 @@ private:
     bool _loadJsonMissionFileV2(const QJsonObject& json, QmlObjectListModel* visualItems, QString& errorString);
     bool _loadTextMissionFile(QTextStream& stream, QmlObjectListModel* visualItems, QString& errorString);
     int _nextSequenceNumber(void);
-    static void _scanForAdditionalSettings(QmlObjectListModel* visualItems, Vehicle* vehicle);
+    void _scanForAdditionalSettings(QmlObjectListModel* visualItems, Vehicle* vehicle);
     static bool _convertToMissionItems(QmlObjectListModel* visualMissionItems, QList<MissionItem*>& rgMissionItems, QObject* missionItemParent);
     void _setPlannedHomePositionFromFirstCoordinate(void);
     void _resetMissionFlightStatus(void);
@@ -253,6 +253,7 @@ private:
     QString                 _surveyMissionItemName;
     QString                 _fwLandingMissionItemName;
     QString                 _structureScanMissionItemName;
+    QString                 _corridorScanMissionItemName;
     AppSettings*            _appSettings;
     double                  _progressPct;
     int                     _currentPlanViewIndex;
