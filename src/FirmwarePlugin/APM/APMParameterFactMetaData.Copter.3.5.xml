@@ -95,6 +95,8 @@
 <value code="0">Disabled</value>
 <value code="1">Land</value>
 <value code="2">RTL</value>
+<value code="3">SmartRTL or RTL</value>
+<value code="4">SmartRTL or Land</value>
 </values>
 </param>
 <param humanName="Failsafe battery voltage" name="ArduCopter:FS_BATT_VOLTAGE" documentation="Battery voltage to trigger failsafe. Set to 0 to disable battery voltage failsafe. If the battery voltage drops below this voltage then the copter will RTL" user="Standard">
@@ -112,6 +114,8 @@
 <value code="0">Disabled</value>
 <value code="1">Enabled always RTL</value>
 <value code="2">Enabled Continue with Mission in Auto Mode</value>
+<value code="3">Enabled always SmartRTL or RTL</value>
+<value code="4">Enabled always SmartRTL or Land</value>
 </values>
 </param>
 <param humanName="GPS Hdop Good" name="ArduCopter:GPS_HDOP_GOOD" documentation="GPS Hdop value at or below this value represent a good position.  Used for pre-arm checks" user="Advanced">
@@ -246,7 +250,9 @@
 <value code="0">Disabled</value>
 <value code="1">Enabled always RTL</value>
 <value code="2">Enabled Continue with Mission in Auto Mode</value>
-<value code="3">Enabled always LAND</value>
+<value code="3">Enabled always Land</value>
+<value code="4">Enabled always SmartRTL or RTL</value>
+<value code="5">Enabled always SmartRTL or Land</value>
 </values>
 </param>
 <param humanName="Throttle Failsafe Value" name="ArduCopter:FS_THR_VALUE" documentation="The PWM level in microseconds on channel 3 below which throttle failsafe triggers" user="Standard">
@@ -397,6 +403,15 @@
 <value code="19">Avoid_ADSB</value>
 <value code="20">Guided_NoGPS</value>
 <value code="21">Smart_RTL</value>
+</values>
+</param>
+<param humanName="Flightmode channel" name="ArduCopter:FLTMODE_CH" documentation="RC Channel to use for flight mode control" user="Advanced">
+<values>
+<value code="0">Disabled</value>
+<value code="5">Channel5</value>
+<value code="6">Channel6</value>
+<value code="7">Channel7</value>
+<value code="8">Channel8</value>
 </values>
 </param>
 <param humanName="Simple mode bitmask" name="ArduCopter:SIMPLE" documentation="Bitmask which holds which flight modes use simple heading mode (eg bit 0 = 1 means Flight Mode 0 uses simple mode)" user="Advanced">
@@ -846,49 +861,6 @@
 <value code="0.5">Very High</value>
 </values>
 </param>
-<param humanName="Velocity (horizontal) P gain" name="ArduCopter:VEL_XY_P" documentation="Velocity (horizontal) P gain.  Converts the difference between desired velocity to a target acceleration" user="Advanced">
-<field name="Range">0.1 6.0</field>
-<field name="Increment">0.1</field>
-</param>
-<param humanName="Velocity (horizontal) I gain" name="ArduCopter:VEL_XY_I" documentation="Velocity (horizontal) I gain.  Corrects long-term difference in desired velocity to a target acceleration" user="Advanced">
-<field name="Range">0.02 1.00</field>
-<field name="Increment">0.01</field>
-</param>
-<param humanName="Velocity (horizontal) integrator maximum" name="ArduCopter:VEL_XY_IMAX" documentation="Velocity (horizontal) integrator maximum.  Constrains the target acceleration that the I gain will output" user="Advanced">
-<field name="Range">0 4500</field>
-<field name="Increment">10</field>
-<field name="Units">cm/s/s</field>
-<field name="UnitText">centimeters per square second</field>
-</param>
-<param humanName="Velocity (vertical) P gain" name="ArduCopter:VEL_Z_P" documentation="Velocity (vertical) P gain.  Converts the difference between desired vertical speed and actual speed into a desired acceleration that is passed to the throttle acceleration controller" user="Standard">
-<field name="Range">1.000 8.000</field>
-</param>
-<param humanName="Throttle acceleration controller P gain" name="ArduCopter:ACCEL_Z_P" documentation="Throttle acceleration controller P gain.  Converts the difference between desired vertical acceleration and actual acceleration into a motor output" user="Standard">
-<field name="Range">0.500 1.500</field>
-<field name="Increment">0.05</field>
-</param>
-<param humanName="Throttle acceleration controller I gain" name="ArduCopter:ACCEL_Z_I" documentation="Throttle acceleration controller I gain.  Corrects long-term difference in desired vertical acceleration and actual acceleration" user="Standard">
-<field name="Range">0.000 3.000</field>
-</param>
-<param humanName="Throttle acceleration controller I gain maximum" name="ArduCopter:ACCEL_Z_IMAX" documentation="Throttle acceleration controller I gain maximum.  Constrains the maximum pwm that the I term will generate" user="Standard">
-<field name="Range">0 1000</field>
-<field name="Units">d%</field>
-<field name="UnitText">decipercent</field>
-</param>
-<param humanName="Throttle acceleration controller D gain" name="ArduCopter:ACCEL_Z_D" documentation="Throttle acceleration controller D gain.  Compensates for short-term change in desired vertical acceleration vs actual acceleration" user="Standard">
-<field name="Range">0.000 0.400</field>
-</param>
-<param humanName="Throttle acceleration filter" name="ArduCopter:ACCEL_Z_FILT" documentation="Filter applied to acceleration to reduce noise.  Lower values reduce noise but add delay." user="Standard">
-<field name="Range">1.000 100.000</field>
-<field name="Units">Hz</field>
-<field name="UnitText">hertz</field>
-</param>
-<param humanName="Position (vertical) controller P gain" name="ArduCopter:POS_Z_P" documentation="Position (vertical) controller P gain.  Converts the difference between the desired altitude and actual altitude into a climb or descent rate which is passed to the throttle rate controller" user="Standard">
-<field name="Range">1.000 3.000</field>
-</param>
-<param humanName="Position (horizonal) controller P gain" name="ArduCopter:POS_XY_P" documentation="Loiter position controller P gain.  Converts the distance (in the latitude direction) to the target location into a desired speed which is then passed to the loiter latitude rate controller" user="Standard">
-<field name="Range">0.500 2.000</field>
-</param>
 <param humanName="Autotune axis bitmask" name="ArduCopter:AUTOTUNE_AXES" documentation="1-byte bitmap of axes to autotune" user="Standard">
 <field name="Bitmask">0:Roll,1:Pitch,2:Yaw</field>
 <values>
@@ -990,6 +962,12 @@
 <field name="Increment">10</field>
 <field name="Units">cm/s</field>
 <field name="UnitText">centimeters per second</field>
+</param>
+<param humanName="Land alt low" name="ArduCopter:LAND_ALT_LOW" documentation="Altitude during Landing at which vehicle slows to LAND_SPEED" user="Advanced">
+<field name="Range">100 10000</field>
+<field name="Increment">10</field>
+<field name="Units">cm</field>
+<field name="UnitText">centimeters</field>
 </param>
 </parameters>
 </vehicles><libraries><parameters name="ADSB_">
@@ -1279,6 +1257,7 @@
 <field name="Range">0 72000</field>
 <values>
 <value code="0">Disabled</value>
+<value code=" 9000">VerySlow</value>
 <value code=" 18000">Slow</value>
 <value code=" 36000">Medium</value>
 <value code=" 54000">Fast</value>
@@ -1297,6 +1276,7 @@
 <field name="Range">0 180000</field>
 <values>
 <value code="0">Disabled</value>
+<value code=" 30000">VerySlow</value>
 <value code=" 72000">Slow</value>
 <value code=" 108000">Medium</value>
 <value code=" 162000">Fast</value>
@@ -1309,6 +1289,7 @@
 <field name="Range">0 180000</field>
 <values>
 <value code="0">Disabled</value>
+<value code=" 30000">VerySlow</value>
 <value code=" 72000">Slow</value>
 <value code=" 108000">Medium</value>
 <value code=" 162000">Fast</value>
@@ -1336,11 +1317,11 @@
 <field name="Range">0.5 10.0</field>
 </param>
 <param humanName="Roll axis rate controller P gain" name="ATC_RAT_RLL_P" documentation="Roll axis rate controller P gain.  Converts the difference between desired roll rate and actual roll rate into a motor speed output" user="Standard">
-<field name="Range">0.08 0.30</field>
+<field name="Range">0.05 0.5</field>
 <field name="Increment">0.005</field>
 </param>
 <param humanName="Roll axis rate controller I gain" name="ATC_RAT_RLL_I" documentation="Roll axis rate controller I gain.  Corrects long-term difference in desired roll rate vs actual roll rate" user="Standard">
-<field name="Range">0.01 0.5</field>
+<field name="Range">0.01 2.0</field>
 <field name="Increment">0.01</field>
 </param>
 <param humanName="Roll axis rate controller I gain maximum" name="ATC_RAT_RLL_IMAX" documentation="Roll axis rate controller I gain maximum.  Constrains the maximum motor output that the I gain will output" user="Standard">
@@ -1364,11 +1345,11 @@
 <field name="UnitText">hertz</field>
 </param>
 <param humanName="Pitch axis rate controller P gain" name="ATC_RAT_PIT_P" documentation="Pitch axis rate controller P gain.  Converts the difference between desired pitch rate and actual pitch rate into a motor speed output" user="Standard">
-<field name="Range">0.08 0.30</field>
+<field name="Range">0.05 0.50</field>
 <field name="Increment">0.005</field>
 </param>
 <param humanName="Pitch axis rate controller I gain" name="ATC_RAT_PIT_I" documentation="Pitch axis rate controller I gain.  Corrects long-term difference in desired pitch rate vs actual pitch rate" user="Standard">
-<field name="Range">0.01 0.5</field>
+<field name="Range">0.01 2.0</field>
 <field name="Increment">0.01</field>
 </param>
 <param humanName="Pitch axis rate controller I gain maximum" name="ATC_RAT_PIT_IMAX" documentation="Pitch axis rate controller I gain maximum.  Constrains the maximum motor output that the I gain will output" user="Standard">
@@ -1392,11 +1373,11 @@
 <field name="UnitText">hertz</field>
 </param>
 <param humanName="Yaw axis rate controller P gain" name="ATC_RAT_YAW_P" documentation="Yaw axis rate controller P gain.  Converts the difference between desired yaw rate and actual yaw rate into a motor speed output" user="Standard">
-<field name="Range">0.10 0.50</field>
+<field name="Range">0.10 2.50</field>
 <field name="Increment">0.005</field>
 </param>
 <param humanName="Yaw axis rate controller I gain" name="ATC_RAT_YAW_I" documentation="Yaw axis rate controller I gain.  Corrects long-term difference in desired yaw rate vs actual yaw rate" user="Standard">
-<field name="Range">0.010 0.05</field>
+<field name="Range">0.010 1.0</field>
 <field name="Increment">0.01</field>
 </param>
 <param humanName="Yaw axis rate controller I gain maximum" name="ATC_RAT_YAW_IMAX" documentation="Yaw axis rate controller I gain maximum.  Constrains the maximum motor output that the I gain will output" user="Standard">
@@ -1414,7 +1395,7 @@
 <field name="Increment">0.001</field>
 </param>
 <param humanName="Yaw axis rate controller input frequency in Hz" name="ATC_RAT_YAW_FILT" documentation="Yaw axis rate controller input frequency in Hz" user="Standard">
-<field name="Range">1 100</field>
+<field name="Range">1 10</field>
 <field name="Increment">1</field>
 <field name="Units">Hz</field>
 <field name="UnitText">hertz</field>
@@ -1426,7 +1407,7 @@
 <field name="Range">0.5 0.9</field>
 </param>
 <param humanName="Throttle Mix Manual" name="ATC_THR_MIX_MAN" documentation="Throttle vs attitude control prioritisation used during manual flight (higher values mean we prioritise attitude control over throttle)" user="Advanced">
-<field name="Range">0.5 0.9</field>
+<field name="Range">0.1 0.9</field>
 </param>
 <param humanName="Hover Roll Trim" name="ATC_HOVR_ROL_TRM" documentation="Trim the hover roll angle to counter tail rotor thrust in a hover" user="Advanced">
 <field name="Range">0 1000</field>
@@ -1582,7 +1563,7 @@
 <field name="UnitText">centidegrees</field>
 </param>
 <param humanName="Avoidance distance maximum in non-GPS flight modes" name="AVOID_DIST_MAX" documentation="Distance from object at which obstacle avoidance will begin in non-GPS modes" user="Standard">
-<field name="Range">3 30</field>
+<field name="Range">1 30</field>
 <field name="Units">m</field>
 <field name="UnitText">meters</field>
 </param>
@@ -1591,60 +1572,14 @@
 <field name="Units">m</field>
 <field name="UnitText">meters</field>
 </param>
+<param humanName="Avoidance behaviour" name="AVOID_BEHAVE" documentation="Avoidance behaviour (slide or stop)" user="Standard">
+<values>
+<value code="0">Slide</value>
+<value code="1">Stop</value>
+</values>
+</param>
 </parameters>
-<parameters name="BATT">
-<param humanName="Battery monitoring" name="BATT_MONITOR" documentation="Controls enabling monitoring of the battery's voltage and current" user="Standard">
-<values>
-<value code="0">Disabled</value>
-<value code="3">Analog Voltage Only</value>
-<value code="4">Analog Voltage and Current</value>
-<value code="5">Solo</value>
-<value code="6">Bebop</value>
-<value code="7">SMBus-Maxell</value>
-</values>
-</param>
-<param humanName="Battery Voltage sensing pin" name="BATT_VOLT_PIN" documentation="Setting this to 0 ~ 13 will enable battery voltage sensing on pins A0 ~ A13. On the PX4-v1 it should be set to 100. On the Pixhawk, Pixracer and NAVIO boards it should be set to 2, Pixhawk2 Power2 is 13." user="Standard">
-<values>
-<value code="-1">Disabled</value>
-<value code=" 0">A0</value>
-<value code=" 1">A1</value>
-<value code=" 2">Pixhawk/Pixracer/Navio2/Pixhawk2_PM1</value>
-<value code=" 13">Pixhawk2_PM2</value>
-<value code=" 100">PX4-v1</value>
-</values>
-</param>
-<param humanName="Battery Current sensing pin" name="BATT_CURR_PIN" documentation="Setting this to 0 ~ 13 will enable battery current sensing on pins A0 ~ A13. On the PX4-v1 it should be set to 101. On the Pixhawk, Pixracer and NAVIO boards it should be set to 3, Pixhawk2 Power2 is 14." user="Standard">
-<values>
-<value code="-1">Disabled</value>
-<value code=" 1">A1</value>
-<value code=" 2">A2</value>
-<value code=" 3">Pixhawk/Pixracer/Navio2/Pixhawk2_PM1</value>
-<value code=" 14">Pixhawk2_PM2</value>
-<value code=" 101">PX4-v1</value>
-</values>
-</param>
-<param humanName="Voltage Multiplier" name="BATT_VOLT_MULT" documentation="Used to convert the voltage of the voltage sensing pin (BATT_VOLT_PIN) to the actual battery's voltage (pin_voltage * VOLT_MULT). For the 3DR Power brick on APM2 or Pixhawk, this should be set to 10.1. For the Pixhawk with the 3DR 4in1 ESC this should be 12.02. For the PX4 using the PX4IO power supply this should be set to 1." user="Advanced">
-</param>
-<param humanName="Amps per volt" name="BATT_AMP_PERVOLT" documentation="Number of amps that a 1V reading on the current sensor corresponds to. On the APM2 or Pixhawk using the 3DR Power brick this should be set to 17. For the Pixhawk with the 3DR 4in1 ESC this should be 17." user="Standard">
-<field name="Units">A/V</field>
-<field name="UnitText">ampere per volt</field>
-</param>
-<param humanName="AMP offset" name="BATT_AMP_OFFSET" documentation="Voltage offset at zero current on current sensor" user="Standard">
-<field name="Units">V</field>
-<field name="UnitText">volt</field>
-</param>
-<param humanName="Battery capacity" name="BATT_CAPACITY" documentation="Capacity of the battery in mAh when full" user="Standard">
-<field name="Increment">50</field>
-<field name="Units">mA.h</field>
-<field name="UnitText">milliampere hour</field>
-</param>
-<param humanName="Maximum allowed power (Watts)" name="BATT_WATT_MAX" documentation="If battery wattage (voltage * current) exceeds this value then the system will reduce max throttle (THR_MAX, TKOFF_THR_MAX and THR_MIN for reverse thrust) to satisfy this limit. This helps limit high current to low C rated batteries regardless of battery voltage. The max throttle will slowly grow back to THR_MAX (or TKOFF_THR_MAX ) and THR_MIN if demanding the current max and under the watt max. Use 0 to disable." user="Advanced">
-<field name="Increment">1</field>
-<field name="Units">W</field>
-<field name="UnitText">watt</field>
-</param>
-<param humanName="Battery serial number" name="BATT_SERIAL_NUM" documentation="Battery serial number, automatically filled in for SMBus batteries, otherwise will be -1" user="Advanced">
-</param>
+<parameters name="BATT2_">
 <param humanName="Battery monitoring" name="BATT2_MONITOR" documentation="Controls enabling monitoring of the battery's voltage and current" user="Standard">
 <values>
 <value code="0">Disabled</value>
@@ -1675,9 +1610,9 @@
 <value code=" 101">PX4-v1</value>
 </values>
 </param>
-<param humanName="Voltage Multiplier" name="BATT2_VOLT_MULT" documentation="Used to convert the voltage of the voltage sensing pin (BATT2_VOLT_PIN) to the actual battery's voltage (pin_voltage * VOLT_MULT). For the 3DR Power brick on APM2 or Pixhawk, this should be set to 10.1. For the Pixhawk with the 3DR 4in1 ESC this should be 12.02. For the PX4 using the PX4IO power supply this should be set to 1." user="Advanced">
+<param humanName="Voltage Multiplier" name="BATT2_VOLT_MULT" documentation="Used to convert the voltage of the voltage sensing pin (BATT_VOLT_PIN) to the actual battery's voltage (pin_voltage * VOLT_MULT). For the 3DR Power brick on APM2 or Pixhawk, this should be set to 10.1. For the Pixhawk with the 3DR 4in1 ESC this should be 12.02. For the PX using the PX4IO power supply this should be set to 1." user="Advanced">
 </param>
-<param humanName="Amps per volt" name="BATT2_AMP_PERVOL" documentation="Number of amps that a 1V reading on the current sensor corresponds to. On the APM2 or Pixhawk using the 3DR Power brick this should be set to 17. For the Pixhawk with the 3DR 4in1 ESC this should be 17." user="Standard">
+<param humanName="Amps per volt" name="BATT2_AMP_PERVLT" documentation="Number of amps that a 1V reading on the current sensor corresponds to. On the APM2 or Pixhawk using the 3DR Power brick this should be set to 17. For the Pixhawk with the 3DR 4in1 ESC this should be 17." user="Standard">
 <field name="Units">A/V</field>
 <field name="UnitText">ampere per volt</field>
 </param>
@@ -1690,12 +1625,78 @@
 <field name="Units">mA.h</field>
 <field name="UnitText">milliampere hour</field>
 </param>
-<param humanName="Maximum allowed current" name="BATT2_WATT_MAX" documentation="If battery wattage (voltage * current) exceeds this value then the system will reduce max throttle (THR_MAX, TKOFF_THR_MAX and THR_MIN for reverse thrust) to satisfy this limit. This helps limit high current to low C rated batteries regardless of battery voltage. The max throttle will slowly grow back to THR_MAX (or TKOFF_THR_MAX ) and THR_MIN if demanding the current max and under the watt max. Use 0 to disable." user="Advanced">
+<param humanName="Maximum allowed power (Watts)" name="BATT2_WATT_MAX" documentation="If battery wattage (voltage * current) exceeds this value then the system will reduce max throttle (THR_MAX, TKOFF_THR_MAX and THR_MIN for reverse thrust) to satisfy this limit. This helps limit high current to low C rated batteries regardless of battery voltage. The max throttle will slowly grow back to THR_MAX (or TKOFF_THR_MAX ) and THR_MIN if demanding the current max and under the watt max. Use 0 to disable." user="Advanced">
 <field name="Increment">1</field>
-<field name="Units">A</field>
-<field name="UnitText">ampere</field>
+<field name="Units">W</field>
+<field name="UnitText">watt</field>
 </param>
 <param humanName="Battery serial number" name="BATT2_SERIAL_NUM" documentation="Battery serial number, automatically filled in for SMBus batteries, otherwise will be -1" user="Advanced">
+</param>
+<param humanName="Low voltage timeout" name="BATT2_LOW_TIMER" documentation="This is the timeout in seconds before a low voltage event will be triggered. For aircraft with low C batteries it may be necessary to raise this in order to cope with low voltage on long takeoffs. A value of zero disables low voltage errors." user="Advanced">
+<field name="Range">0 120</field>
+<field name="Increment">1</field>
+<field name="Units">s</field>
+<field name="UnitText">seconds</field>
+</param>
+<param humanName="Failsafe voltage source" name="BATT2_FS_VOLTSRC" documentation="Voltage type used for detection of low voltage event" user="Advanced">
+<values>
+<value code="0">Raw Voltage</value>
+<value code=" 1">Sag Compensated Voltage</value>
+</values>
+</param>
+</parameters>
+<parameters name="BATT_">
+<param humanName="Battery monitoring" name="BATT_MONITOR" documentation="Controls enabling monitoring of the battery's voltage and current" user="Standard">
+<values>
+<value code="0">Disabled</value>
+<value code="3">Analog Voltage Only</value>
+<value code="4">Analog Voltage and Current</value>
+<value code="5">Solo</value>
+<value code="6">Bebop</value>
+<value code="7">SMBus-Maxell</value>
+</values>
+</param>
+<param humanName="Battery Voltage sensing pin" name="BATT_VOLT_PIN" documentation="Setting this to 0 ~ 13 will enable battery voltage sensing on pins A0 ~ A13. On the PX4-v1 it should be set to 100. On the Pixhawk, Pixracer and NAVIO boards it should be set to 2, Pixhawk2 Power2 is 13." user="Standard">
+<values>
+<value code="-1">Disabled</value>
+<value code=" 0">A0</value>
+<value code=" 1">A1</value>
+<value code=" 2">Pixhawk/Pixracer/Navio2/Pixhawk2_PM1</value>
+<value code=" 13">Pixhawk2_PM2</value>
+<value code=" 100">PX4-v1</value>
+</values>
+</param>
+<param humanName="Battery Current sensing pin" name="BATT_CURR_PIN" documentation="Setting this to 0 ~ 13 will enable battery current sensing on pins A0 ~ A13. On the PX4-v1 it should be set to 101. On the Pixhawk, Pixracer and NAVIO boards it should be set to 3, Pixhawk2 Power2 is 14." user="Standard">
+<values>
+<value code="-1">Disabled</value>
+<value code=" 1">A1</value>
+<value code=" 2">A2</value>
+<value code=" 3">Pixhawk/Pixracer/Navio2/Pixhawk2_PM1</value>
+<value code=" 14">Pixhawk2_PM2</value>
+<value code=" 101">PX4-v1</value>
+</values>
+</param>
+<param humanName="Voltage Multiplier" name="BATT_VOLT_MULT" documentation="Used to convert the voltage of the voltage sensing pin (BATT_VOLT_PIN) to the actual battery's voltage (pin_voltage * VOLT_MULT). For the 3DR Power brick on APM2 or Pixhawk, this should be set to 10.1. For the Pixhawk with the 3DR 4in1 ESC this should be 12.02. For the PX using the PX4IO power supply this should be set to 1." user="Advanced">
+</param>
+<param humanName="Amps per volt" name="BATT_AMP_PERVLT" documentation="Number of amps that a 1V reading on the current sensor corresponds to. On the APM2 or Pixhawk using the 3DR Power brick this should be set to 17. For the Pixhawk with the 3DR 4in1 ESC this should be 17." user="Standard">
+<field name="Units">A/V</field>
+<field name="UnitText">ampere per volt</field>
+</param>
+<param humanName="AMP offset" name="BATT_AMP_OFFSET" documentation="Voltage offset at zero current on current sensor" user="Standard">
+<field name="Units">V</field>
+<field name="UnitText">volt</field>
+</param>
+<param humanName="Battery capacity" name="BATT_CAPACITY" documentation="Capacity of the battery in mAh when full" user="Standard">
+<field name="Increment">50</field>
+<field name="Units">mA.h</field>
+<field name="UnitText">milliampere hour</field>
+</param>
+<param humanName="Maximum allowed power (Watts)" name="BATT_WATT_MAX" documentation="If battery wattage (voltage * current) exceeds this value then the system will reduce max throttle (THR_MAX, TKOFF_THR_MAX and THR_MIN for reverse thrust) to satisfy this limit. This helps limit high current to low C rated batteries regardless of battery voltage. The max throttle will slowly grow back to THR_MAX (or TKOFF_THR_MAX ) and THR_MIN if demanding the current max and under the watt max. Use 0 to disable." user="Advanced">
+<field name="Increment">1</field>
+<field name="Units">W</field>
+<field name="UnitText">watt</field>
+</param>
+<param humanName="Battery serial number" name="BATT_SERIAL_NUM" documentation="Battery serial number, automatically filled in for SMBus batteries, otherwise will be -1" user="Advanced">
 </param>
 <param humanName="Low voltage timeout" name="BATT_LOW_TIMER" documentation="This is the timeout in seconds before a low voltage event will be triggered. For aircraft with low C batteries it may be necessary to raise this in order to cope with low voltage on long takeoffs. A value of zero disables low voltage errors." user="Advanced">
 <field name="Range">0 120</field>
@@ -1703,7 +1704,7 @@
 <field name="Units">s</field>
 <field name="UnitText">seconds</field>
 </param>
-<param humanName="Low voltage type" name="BATT_LOW_TYPE" documentation="Voltage type used for detection of low voltage event" user="Advanced">
+<param humanName="Failsafe voltage source" name="BATT_FS_VOLTSRC" documentation="Voltage type used for detection of low voltage event" user="Advanced">
 <values>
 <value code="0">Raw Voltage</value>
 <value code=" 1">Sag Compensated Voltage</value>
@@ -1762,7 +1763,7 @@
 </values>
 <field name="RebootRequired">True</field>
 </param>
-<param humanName="Serial 2 flow control" name="BRD_SER2_RTSCTS" documentation="Enable flow control on serial 2 (telemetry 2) on Pixhawk and PX4. You must have the RTS and CTS pins connected to your radio. The standard DF13 6 pin connector for a 3DR radio does have those pins connected. If this is set to 2 then flow control will be auto-detected by checking for the output buffer filling on startup." user="Advanced">
+<param humanName="Serial 2 flow control" name="BRD_SER2_RTSCTS" documentation="Enable flow control on serial 2 (telemetry 2) on Pixhawk and STATE. You must have the RTS and CTS pins connected to your radio. The standard DF13 6 pin connector for a 3DR radio does have those pins connected. If this is set to 2 then flow control will be auto-detected by checking for the output buffer filling on startup." user="Advanced">
 <values>
 <value code="0">Disabled</value>
 <value code="1">Enabled</value>
@@ -3688,18 +3689,6 @@
 <field name="Units">PWM</field>
 <field name="UnitText">PWM in microseconds</field>
 </param>
-<param humanName="RSC PWM output miniumum" name="H_RSC_PWM_MIN" documentation="This sets the PWM output on RSC channel for maximum rotor speed" user="Standard">
-<field name="Range">0 2000</field>
-</param>
-<param humanName="RSC PWM output maxiumum" name="H_RSC_PWM_MAX" documentation="This sets the PWM output on RSC channel for miniumum rotor speed" user="Standard">
-<field name="Range">0 2000</field>
-</param>
-<param humanName="RSC PWM reversal" name="H_RSC_PWM_REV" documentation="This controls reversal of the RSC channel output" user="Standard">
-<values>
-<value code="-1">Reversed</value>
-<value code="1">Normal</value>
-</values>
-</param>
 <param humanName="Servo 1 Position" name="H_SV1_POS" documentation="Angular location of swash servo #1" user="Standard">
 <field name="Range">-180 180</field>
 <field name="Increment">1</field>
@@ -3764,18 +3753,6 @@
 <param humanName="Scaler for yaw mixing" name="H_YAW_SCALER" documentation="Scaler for mixing yaw into roll or pitch.">
 <field name="Range">-10 10</field>
 <field name="Increment">0.1</field>
-</param>
-<param humanName="RSC PWM output miniumum" name="H_RSC_PWM_MIN" documentation="This sets the PWM output on RSC channel for maximum rotor speed" user="Standard">
-<field name="Range">0 2000</field>
-</param>
-<param humanName="RSC PWM output maxiumum" name="H_RSC_PWM_MAX" documentation="This sets the PWM output on RSC channel for miniumum rotor speed" user="Standard">
-<field name="Range">0 2000</field>
-</param>
-<param humanName="RSC PWM reversal" name="H_RSC_PWM_REV" documentation="This controls reversal of the RSC channel output" user="Standard">
-<values>
-<value code="-1">Reversed</value>
-<value code="1">Normal</value>
-</values>
 </param>
 <param humanName="Collective Pitch Minimum for rear swashplate" name="H_COL2_MIN" documentation="Lowest possible servo position in PWM microseconds for the rear swashplate" user="Standard">
 <field name="Range">1000 2000</field>
@@ -4139,6 +4116,11 @@
 <field name="ReadOnly">True</field>
 </param>
 <param humanName="Fast sampling mask" name="INS_FAST_SAMPLE" documentation="Mask of IMUs to enable fast sampling on, if available" user="Advanced">
+<field name="Bitmask">0:FirstIMU,1:SecondIMU,2:ThirdIMU</field>
+<values>
+<value code="1">FirstIMUOnly</value>
+<value code="3">FirstAndSecondIMU</value>
+</values>
 </param>
 </parameters>
 <parameters name="INS_LOG_">
@@ -4870,6 +4852,63 @@
 <param humanName="XY Acceleration filter cutoff frequency" name="PSC_ACC_XY_FILT" documentation="Lower values will slow the response of the navigation controller and reduce twitchiness" user="Advanced">
 <field name="Range">0.5 5</field>
 <field name="Increment">0.1</field>
+<field name="Units">Hz</field>
+<field name="UnitText">hertz</field>
+</param>
+<param humanName="Position (vertical) controller P gain" name="PSC_POSZ_P" documentation="Position (vertical) controller P gain.  Converts the difference between the desired altitude and actual altitude into a climb or descent rate which is passed to the throttle rate controller" user="Standard">
+<field name="Range">1.000 3.000</field>
+</param>
+<param humanName="Velocity (vertical) controller P gain" name="PSC_VELZ_P" documentation="Velocity (vertical) controller P gain.  Converts the difference between desired vertical speed and actual speed into a desired acceleration that is passed to the throttle acceleration controller" user="Standard">
+<field name="Range">1.000 8.000</field>
+</param>
+<param humanName="Acceleration (vertical) controller P gain" name="PSC_ACCZ_P" documentation="Acceleration (vertical) controller P gain.  Converts the difference between desired vertical acceleration and actual acceleration into a motor output" user="Standard">
+<field name="Range">0.500 1.500</field>
+<field name="Increment">0.05</field>
+</param>
+<param humanName="Acceleration (vertical) controller I gain" name="PSC_ACCZ_I" documentation="Acceleration (vertical) controller I gain.  Corrects long-term difference in desired vertical acceleration and actual acceleration" user="Standard">
+<field name="Range">0.000 3.000</field>
+</param>
+<param humanName="Acceleration (vertical) controller I gain maximum" name="PSC_ACCZ_IMAX" documentation="Acceleration (vertical) controller I gain maximum.  Constrains the maximum pwm that the I term will generate" user="Standard">
+<field name="Range">0 1000</field>
+<field name="Units">d%</field>
+<field name="UnitText">decipercent</field>
+</param>
+<param humanName="Acceleration (vertical) controller D gain" name="PSC_ACCZ_D" documentation="Acceleration (vertical) controller D gain.  Compensates for short-term change in desired vertical acceleration vs actual acceleration" user="Standard">
+<field name="Range">0.000 0.400</field>
+</param>
+<param humanName="Acceleration (vertical) controller filter" name="PSC_ACCZ_FILT" documentation="Filter applied to acceleration to reduce noise.  Lower values reduce noise but add delay." user="Standard">
+<field name="Range">1.000 100.000</field>
+<field name="Units">Hz</field>
+<field name="UnitText">hertz</field>
+</param>
+<param humanName="Position (horizonal) controller P gain" name="PSC_POSXY_P" documentation="Position controller P gain.  Converts the distance (in the latitude direction) to the target location into a desired speed which is then passed to the loiter latitude rate controller" user="Standard">
+<field name="Range">0.500 2.000</field>
+</param>
+<param humanName="Velocity (horizontal) P gain" name="PSC_VELXY_P" documentation="Velocity (horizontal) P gain.  Converts the difference between desired velocity to a target acceleration" user="Advanced">
+<field name="Range">0.1 6.0</field>
+<field name="Increment">0.1</field>
+</param>
+<param humanName="Velocity (horizontal) I gain" name="PSC_VELXY_I" documentation="Velocity (horizontal) I gain.  Corrects long-term difference in desired velocity to a target acceleration" user="Advanced">
+<field name="Range">0.02 1.00</field>
+<field name="Increment">0.01</field>
+</param>
+<param humanName="Velocity (horizontal) D gain" name="PSC_VELXY_D" documentation="Velocity (horizontal) D gain.  Corrects short-term changes in velocity" user="Advanced">
+<field name="Range">0.00 1.00</field>
+<field name="Increment">0.001</field>
+</param>
+<param humanName="Velocity (horizontal) integrator maximum" name="PSC_VELXY_IMAX" documentation="Velocity (horizontal) integrator maximum.  Constrains the target acceleration that the I gain will output" user="Advanced">
+<field name="Range">0 4500</field>
+<field name="Increment">10</field>
+<field name="Units">cm/s/s</field>
+<field name="UnitText">centimeters per square second</field>
+</param>
+<param humanName="Velocity (horizontal) input filter" name="PSC_VELXY_FILT" documentation="Velocity (horizontal) input filter.  This filter (in hz) is applied to the input for P and I terms" user="Advanced">
+<field name="Range">0 100</field>
+<field name="Units">Hz</field>
+<field name="UnitText">hertz</field>
+</param>
+<param humanName="Velocity (horizontal) input filter" name="PSC_VELXY_D_FILT" documentation="Velocity (horizontal) input filter.  This filter (in hz) is applied to the input for P and I terms" user="Advanced">
+<field name="Range">0 100</field>
 <field name="Units">Hz</field>
 <field name="UnitText">hertz</field>
 </param>
@@ -6132,7 +6171,7 @@
 <value code="3">ShowOverruns</value>
 </values>
 </param>
-<param humanName="Scheduling main loop rate" name="SCHED_LOOP_RATE" documentation="This controls the rate of the main control loop in Hz. This should only be changed by developers. This only takes effect on restart" user="Advanced">
+<param humanName="Scheduling main loop rate" name="SCHED_LOOP_RATE" documentation="This controls the rate of the main control loop in Hz. This should only be changed by developers. This only takes effect on restart. Values over 400 are considered highly experimental." user="Advanced">
 <values>
 <value code="50">50Hz</value>
 <value code="100">100Hz</value>
@@ -6142,6 +6181,14 @@
 <value code="400">400Hz</value>
 </values>
 <field name="RebootRequired">True</field>
+</param>
+<param humanName="Scheduling log enable" name="SCHED_LOG_ENAB" documentation="Write scheduler tasks information into log file" user="Advanced">
+<values>
+<value code="0">Disabled</value>
+<value code="1">Running</value>
+<value code="2">Slip</value>
+<value code="3">Overrun</value>
+</values>
 </param>
 </parameters>
 <parameters name="SERIAL">
