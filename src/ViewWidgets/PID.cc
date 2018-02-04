@@ -15,9 +15,14 @@ PID::PID(const QString& title, QAction* action, QWidget *parent) :
 {
     Q_UNUSED(title);
     Q_UNUSED(action);
-    int screenWidth=QApplication::desktop()->width();
-    int screenHeight=QApplication::desktop()->height();
+
+    // Adjust the size
+    QScreen* scr = QApplication::primaryScreen();
+    QSize scrSize = scr->availableSize();
+    int screenWidth=scrSize.width();
+    int screenHeight=scrSize.height();
     this->resize(screenWidth*1/5, screenHeight*1/2);
+
     setSource(QUrl::fromUserInput("qrc:/qml/PID.qml"));
     loadSettings();
 }
