@@ -7,7 +7,7 @@
  *
  ****************************************************************************/
 
-
+#include <QScreen>
 #include "PID.h"
 
 PID::PID(const QString& title, QAction* action, QWidget *parent) :
