@@ -7,7 +7,7 @@
  *
  ****************************************************************************/
 
-
+#include <QScreen>
 #include "MavlinkDebug.h"
 
 MavlinkDebug::MavlinkDebug(const QString& title, QAction* action, QWidget *parent) :
