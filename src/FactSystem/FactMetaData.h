@@ -36,6 +36,8 @@ public:
         valueTypeInt16,
         valueTypeUint32,
         valueTypeInt32,
+        valueTypeUint64,
+        valueTypeInt64,
         valueTypeFloat,
         valueTypeDouble,
         valueTypeString,
@@ -110,6 +112,7 @@ public:
     /// Amount to increment value when used in controls such as spin button or slider with detents.
     /// NaN for no increment available.
     double          increment               (void) const { return _increment; }
+    double          cookedIncrement         (void) const;
 
     Translator      rawTranslator           (void) const { return _rawTranslator; }
     Translator      cookedTranslator        (void) const { return _cookedTranslator; }

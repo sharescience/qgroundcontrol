@@ -56,7 +56,7 @@ Item {
     QGCMapPolygonVisuals {
         qgcView:            _root.qgcView
         mapControl:         map
-        mapPolygon:         object.corridorPolygon
+        mapPolygon:         object.surveyAreaPolygon
         interactive:        false
         interiorColor:      "green"
         interiorOpacity:    0.25
@@ -119,7 +119,7 @@ Item {
         MapPolyline {
             line.color: "white"
             line.width: 2
-            path:       _missionItem.transectPoints
+            path:       _missionItem.visualTransectPoints
         }
     }
 }

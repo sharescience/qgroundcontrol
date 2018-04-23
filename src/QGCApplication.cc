@@ -57,7 +57,6 @@
 #include "FirmwarePluginManager.h"
 #include "MultiVehicleManager.h"
 #include "Vehicle.h"
-#include "MavlinkQmlSingleton.h"
 #include "JoystickConfigController.h"
 #include "JoystickManager.h"
 #include "QmlObjectListModel.h"
@@ -133,11 +132,6 @@ static QObject* screenToolsControllerSingletonFactory(QQmlEngine*, QJSEngine*)
     return screenToolsController;
 }
 
-static QObject* mavlinkQmlSingletonFactory(QQmlEngine*, QJSEngine*)
-{
-    return new MavlinkQmlSingleton;
-}
-
 static QObject* qgroundcontrolQmlGlobalSingletonFactory(QQmlEngine*, QJSEngine*)
 {
     // We create this object as a QGCTool even though it isn't in the toolbox
@@ -147,31 +141,22 @@ static QObject* qgroundcontrolQmlGlobalSingletonFactory(QQmlEngine*, QJSEngine*)
     return qmlGlobal;
 }
 
-/**
- * @brief Constructor for the main application.
- *
- * This constructor initializes and starts the whole application. It takes standard
- * command-line parameters
- *
- * @param argc The number of command-line parameters
- * @param argv The string array of parameters
- **/
-
 QGCApplication::QGCApplication(int &argc, char* argv[], bool unitTesting)
 #ifdef __mobile__
-    : QGuiApplication(argc, argv)
-    , _qmlAppEngine(NULL)
-    #else
-    : QApplication(argc, argv)
-    #endif
-    , _runningUnitTests(unitTesting)
-    , _fakeMobile(false)
-    , _settingsUpgraded(false)
-    #ifdef QT_DEBUG
-    , _testHighDPI(false)
-    #endif
-    , _toolbox(NULL)
-    , _bluetoothAvailable(false)
+    : QGuiApplication       (argc, argv)
+    , _qmlAppEngine         (NULL)
+#else
+    : QApplication          (argc, argv)
+#endif
+    , _runningUnitTests     (unitTesting)
+    , _logOutput            (false)
+    , _fakeMobile           (false)
+    , _settingsUpgraded     (false)
+#ifdef QT_DEBUG
+    , _testHighDPI          (false)
+#endif
+    , _toolbox              (NULL)
+    , _bluetoothAvailable   (false)
 {
     _app = this;
 
@@ -234,6 +219,7 @@ QGCApplication::QGCApplication(int &argc, char* argv[], bool unitTesting)
         { "--clear-settings",   &fClearSettingsOptions, NULL },
         { "--logging",          &logging,               &loggingOptions },
         { "--fake-mobile",      &_fakeMobile,           NULL },
+        { "--log-output",       &_logOutput,            NULL },
     #ifdef QT_DEBUG
         { "--test-high-dpi",    &_testHighDPI,          NULL },
     #endif
@@ -352,6 +338,7 @@ void QGCApplication::_shutdown(void)
 QGCApplication::~QGCApplication()
 {
     // Place shutdown code in _shutdown
+    _app = NULL;
 }
 
 void QGCApplication::_initCommon(void)
@@ -410,7 +397,6 @@ void QGCApplication::_initCommon(void)
     // Register Qml Singletons
     qmlRegisterSingletonType<QGroundControlQmlGlobal>   ("QGroundControl",                          1, 0, "QGroundControl",         qgroundcontrolQmlGlobalSingletonFactory);
     qmlRegisterSingletonType<ScreenToolsController>     ("QGroundControl.ScreenToolsController",    1, 0, "ScreenToolsController",  screenToolsControllerSingletonFactory);
-    qmlRegisterSingletonType<MavlinkQmlSingleton>       ("QGroundControl.Mavlink",                  1, 0, "Mavlink",                mavlinkQmlSingletonFactory);
 }
 
 bool QGCApplication::_initForNormalAppBoot(void)

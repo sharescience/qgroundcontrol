@@ -48,6 +48,7 @@ PX4FirmwarePlugin::PX4FirmwarePlugin(void)
     , _missionFlightMode(tr("Mission"))
     , _rtlFlightMode(tr("Return"))
     , _landingFlightMode(tr("Land"))
+    , _preclandFlightMode(tr("Precision Land"))
     , _rtgsFlightMode(tr("Return to Groundstation"))
     , _followMeFlightMode(tr("Follow Me"))
     , _simpleFlightMode(tr("Simple"))
@@ -84,6 +85,7 @@ PX4FirmwarePlugin::PX4FirmwarePlugin(void)
         { PX4_CUSTOM_MAIN_MODE_OFFBOARD,    0,                                      true,   false,  true },
         // modes that can't be directly set by the user
         { PX4_CUSTOM_MAIN_MODE_AUTO,        PX4_CUSTOM_SUB_MODE_AUTO_LAND,          false,  true,   true },
+        { PX4_CUSTOM_MAIN_MODE_AUTO,        PX4_CUSTOM_SUB_MODE_AUTO_PRECLAND,      false,  false,  true },
         { PX4_CUSTOM_MAIN_MODE_AUTO,        PX4_CUSTOM_SUB_MODE_AUTO_READY,         false,  true,   true },
         { PX4_CUSTOM_MAIN_MODE_AUTO,        PX4_CUSTOM_SUB_MODE_AUTO_RTGS,          false,  true,   true },
         { PX4_CUSTOM_MAIN_MODE_AUTO,        PX4_CUSTOM_SUB_MODE_AUTO_TAKEOFF,       false,  true,   true },
@@ -104,6 +106,7 @@ PX4FirmwarePlugin::PX4FirmwarePlugin(void)
         &_followMeFlightMode,
         &_offboardFlightMode,
         &_landingFlightMode,
+        &_preclandFlightMode,
         &_readyFlightMode,
         &_rtgsFlightMode,
         &_takeoffFlightMode,
@@ -227,7 +230,7 @@ int PX4FirmwarePlugin::manualControlReservedButtonCount(void)
 
 bool PX4FirmwarePlugin::isCapable(const Vehicle *vehicle, FirmwareCapabilities capabilities)
 {
-    int available = MavCmdPreflightStorageCapability | SetFlightModeCapability | PauseVehicleCapability | GuidedModeCapability;
+    int available = SetFlightModeCapability | PauseVehicleCapability | GuidedModeCapability;
     if (vehicle->multiRotor() || vehicle->vtol()) {
         available |= TakeoffVehicleCapability;
     }
@@ -588,4 +591,13 @@ QGCCameraManager* PX4FirmwarePlugin::createCameraManager(Vehicle* vehicle)
 QGCCameraControl* PX4FirmwarePlugin::createCameraControl(const mavlink_camera_information_t* info, Vehicle *vehicle, int compID, QObject* parent)
 {
     return new QGCCameraControl(info, vehicle, compID, parent);
+}
+
+uint32_t PX4FirmwarePlugin::highLatencyCustomModeTo32Bits(uint16_t hlCustomMode)
+{
+    union px4_custom_mode px4_cm;
+    px4_cm.data = 0;
+    px4_cm.custom_mode_hl = hlCustomMode;
+
+    return px4_cm.data;
 }

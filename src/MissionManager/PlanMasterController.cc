@@ -345,6 +345,22 @@ void PlanMasterController::loadFromFile(const QString& filename)
     }
 }
 
+QJsonDocument PlanMasterController::saveToJson()
+{
+    QJsonObject planJson;
+    QJsonObject missionJson;
+    QJsonObject fenceJson;
+    QJsonObject rallyJson;
+    JsonHelper::saveQGCJsonFileHeader(planJson, _planFileType, _planFileVersion);
+    _missionController.save(missionJson);
+    _geoFenceController.save(fenceJson);
+    _rallyPointController.save(rallyJson);
+    planJson[_jsonMissionObjectKey] = missionJson;
+    planJson[_jsonGeoFenceObjectKey] = fenceJson;
+    planJson[_jsonRallyPointsObjectKey] = rallyJson;
+    return QJsonDocument(planJson);
+}
+
 void PlanMasterController::saveToFile(const QString& filename)
 {
     if (filename.isEmpty()) {
@@ -361,20 +377,7 @@ void PlanMasterController::saveToFile(const QString& filename)
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         qgcApp()->showMessage(tr("Plan save error %1 : %2").arg(filename).arg(file.errorString()));
     } else {
-        QJsonObject planJson;
-        QJsonObject missionJson;
-        QJsonObject fenceJson;
-        QJsonObject rallyJson;
-
-        JsonHelper::saveQGCJsonFileHeader(planJson, _planFileType, _planFileVersion);
-        _missionController.save(missionJson);
-        _geoFenceController.save(fenceJson);
-        _rallyPointController.save(rallyJson);
-        planJson[_jsonMissionObjectKey] = missionJson;
-        planJson[_jsonGeoFenceObjectKey] = fenceJson;
-        planJson[_jsonRallyPointsObjectKey] = rallyJson;
-
-        QJsonDocument saveDoc(planJson);
+        QJsonDocument saveDoc = saveToJson();
         file.write(saveDoc.toJson());
     }
 
@@ -413,6 +416,11 @@ void PlanMasterController::removeAll(void)
     _missionController.removeAll();
     _geoFenceController.removeAll();
     _rallyPointController.removeAll();
+    if (_offline) {
+        _missionController.setDirty(false);
+        _geoFenceController.setDirty(false);
+        _rallyPointController.setDirty(false);
+    }
 }
 
 void PlanMasterController::removeAllFromVehicle(void)

@@ -277,7 +277,7 @@ void MissionController::convertToKMLDocument(QDomDocument& document)
         return;
     }
 
-    float altitude = missionJson[_jsonPlannedHomePositionKey].toArray()[2].toDouble();
+    float homeAltitude = missionJson[_jsonPlannedHomePositionKey].toArray()[2].toDouble();
 
     QString coord;
     QStringList coords;
@@ -292,11 +292,12 @@ void MissionController::convertToKMLDocument(QDomDocument& document)
                 qgcApp()->toolbox()->missionCommandTree()->getUIInfo(_controllerVehicle, item->command());
 
         if (uiInfo && uiInfo->specifiesCoordinate() && !uiInfo->isStandaloneCoordinate()) {
+            double amslAltitude = item->param7() + (item->frame() == MAV_FRAME_GLOBAL ? 0 : homeAltitude);
             coord = QString::number(item->param6(),'f',7) \
                     + "," \
                     + QString::number(item->param5(),'f',7) \
                     + "," \
-                    + QString::number(item->param7() + altitude,'f',2);
+                    + QString::number(amslAltitude,'f',2);
             coords.append(coord);
         }
     }
@@ -334,22 +335,22 @@ int MissionController::insertSimpleMissionItem(QGeoCoordinate coordinate, int i)
     SimpleMissionItem * newItem = new SimpleMissionItem(_controllerVehicle, this);
     newItem->setSequenceNumber(sequenceNumber);
     newItem->setCoordinate(coordinate);
-    newItem->setCommand(MavlinkQmlSingleton::MAV_CMD_NAV_WAYPOINT);
+    newItem->setCommand(MAV_CMD_NAV_WAYPOINT);
     _initVisualItem(newItem);
     if (_visualItems->count() == 1) {
-        MavlinkQmlSingleton::Qml_MAV_CMD takeoffCmd = _controllerVehicle->vtol() ? MavlinkQmlSingleton::MAV_CMD_NAV_VTOL_TAKEOFF : MavlinkQmlSingleton::MAV_CMD_NAV_TAKEOFF;
+        MAV_CMD takeoffCmd = _controllerVehicle->vtol() ? MAV_CMD_NAV_VTOL_TAKEOFF : MAV_CMD_NAV_TAKEOFF;
         if (_controllerVehicle->firmwarePlugin()->supportedMissionCommands().contains((MAV_CMD)takeoffCmd)) {
             newItem->setCommand(takeoffCmd);
         }
     }
     newItem->setDefaultsForCommand();
-    if ((MAV_CMD)newItem->command() == MAV_CMD_NAV_WAYPOINT) {
-        double      prevAltitude;
-        MAV_FRAME   prevFrame;
+    if (newItem->specifiesAltitude()) {
+        double  prevAltitude;
+        int     prevAltitudeMode;
 
-        if (_findPreviousAltitude(i, &prevAltitude, &prevFrame)) {
-            newItem->missionItem().setFrame(prevFrame);
-            newItem->missionItem().setParam7(prevAltitude);
+        if (_findPreviousAltitude(i, &prevAltitude, &prevAltitudeMode)) {
+            newItem->altitude()->setRawValue(prevAltitude);
+            newItem->setAltitudeMode((SimpleMissionItem::AltitudeMode)prevAltitudeMode);
         }
     }
     newItem->setMissionFlightStatus(_missionFlightStatus);
@@ -365,19 +366,19 @@ int MissionController::insertROIMissionItem(QGeoCoordinate coordinate, int i)
     int sequenceNumber = _nextSequenceNumber();
     SimpleMissionItem * newItem = new SimpleMissionItem(_controllerVehicle, this);
     newItem->setSequenceNumber(sequenceNumber);
-    newItem->setCommand((MavlinkQmlSingleton::Qml_MAV_CMD)(_controllerVehicle->firmwarePlugin()->supportedMissionCommands().contains((MAV_CMD)MAV_CMD_DO_SET_ROI_LOCATION) ?
+    newItem->setCommand((MAV_CMD)(_controllerVehicle->firmwarePlugin()->supportedMissionCommands().contains((MAV_CMD)MAV_CMD_DO_SET_ROI_LOCATION) ?
         MAV_CMD_DO_SET_ROI_LOCATION :
         MAV_CMD_DO_SET_ROI));
     _initVisualItem(newItem);
     newItem->setDefaultsForCommand();
     newItem->setCoordinate(coordinate);
 
-    double      prevAltitude;
-    MAV_FRAME   prevFrame;
+    double  prevAltitude;
+    int     prevAltitudeMode;
 
-    if (_findPreviousAltitude(i, &prevAltitude, &prevFrame)) {
-        newItem->missionItem().setFrame(prevFrame);
-        newItem->missionItem().setParam7(prevAltitude);
+    if (_findPreviousAltitude(i, &prevAltitude, &prevAltitudeMode)) {
+        newItem->altitude()->setRawValue(prevAltitude);
+        newItem->setAltitudeMode((SimpleMissionItem::AltitudeMode)prevAltitudeMode);
     }
     _visualItems->insert(i, newItem);
 
@@ -493,6 +494,7 @@ void MissionController::removeAll(void)
 {
     if (_visualItems) {
         _deinitAllVisualItems();
+        _visualItems->clearAndDeleteContents();
         _visualItems->deleteLater();
         _settingsItem = NULL;
         _visualItems = new QmlObjectListModel(this);
@@ -838,7 +840,7 @@ bool MissionController::_loadTextMissionFile(QTextStream& stream, QmlObjectListM
         // Update sequence numbers in DO_JUMP commands to take into account added home position in index 0
         for (int i=1; i<visualItems->count(); i++) {
             SimpleMissionItem* item = qobject_cast<SimpleMissionItem*>(visualItems->get(i));
-            if (item && item->command() == MavlinkQmlSingleton::MAV_CMD_DO_JUMP) {
+            if (item && item->command() == MAV_CMD_DO_JUMP) {
                 item->missionItem().setParam1((int)item->missionItem().param1() + 1);
             }
         }
@@ -919,6 +921,18 @@ bool MissionController::loadTextFile(QFile& file, QString& errorString)
     }
 
     _initLoadedVisualItems(loadedVisualItems);
+
+    return true;
+}
+
+bool MissionController::readyForSaveSend(void) const
+{
+    for (int i=0; i<_visualItems->count(); i++) {
+        VisualMissionItem* visualItem = qobject_cast<VisualMissionItem*>(_visualItems->get(i));
+        if (!visualItem->readyForSave()) {
+            return false;
+        }
+    }
 
     return true;
 }
@@ -1283,7 +1297,7 @@ void MissionController::_recalcMissionFlightStatus()
         }
 
         // Link back to home if first item is takeoff and we have home position
-        if (firstCoordinateItem && simpleItem && simpleItem->command() == MavlinkQmlSingleton::MAV_CMD_NAV_TAKEOFF) {
+        if (firstCoordinateItem && simpleItem && (simpleItem->command() == MAV_CMD_NAV_TAKEOFF || simpleItem->command() == MAV_CMD_NAV_VTOL_TAKEOFF)) {
             if (showHomePosition) {
                 linkStartToHome = true;
                 if (_controllerVehicle->multiRotor() || _controllerVehicle->vtol()) {
@@ -1299,13 +1313,19 @@ void MissionController::_recalcMissionFlightStatus()
         // Update VTOL state
         if (simpleItem && _controllerVehicle->vtol()) {
             switch (simpleItem->command()) {
-            case MavlinkQmlSingleton::MAV_CMD_NAV_TAKEOFF:
+            case MAV_CMD_NAV_TAKEOFF:
                 vtolInHover = false;
                 break;
-            case MavlinkQmlSingleton::MAV_CMD_NAV_LAND:
+            case MAV_CMD_NAV_VTOL_TAKEOFF:
+                vtolInHover = true;
+                break;
+            case MAV_CMD_NAV_LAND:
                 vtolInHover = false;
                 break;
-            case MavlinkQmlSingleton::MAV_CMD_DO_VTOL_TRANSITION:
+            case MAV_CMD_NAV_VTOL_LAND:
+                vtolInHover = true;
+                break;
+            case MAV_CMD_DO_VTOL_TRANSITION:
             {
                 int transitionState = simpleItem->missionItem().param1();
                 if (transitionState == MAV_VTOL_STATE_TRANSITION_TO_MC) {
@@ -1647,11 +1667,11 @@ void MissionController::_inProgressChanged(bool inProgress)
     emit syncInProgressChanged(inProgress);
 }
 
-bool MissionController::_findPreviousAltitude(int newIndex, double* prevAltitude, MAV_FRAME* prevFrame)
+bool MissionController::_findPreviousAltitude(int newIndex, double* prevAltitude, int* prevAltitudeMode)
 {
     bool        found = false;
     double      foundAltitude;
-    MAV_FRAME   foundFrame;
+    int         foundAltitudeMode;
 
     if (newIndex > _visualItems->count()) {
         return false;
@@ -1664,9 +1684,9 @@ bool MissionController::_findPreviousAltitude(int newIndex, double* prevAltitude
         if (visualItem->specifiesCoordinate() && !visualItem->isStandaloneCoordinate()) {
             if (visualItem->isSimpleItem()) {
                 SimpleMissionItem* simpleItem = qobject_cast<SimpleMissionItem*>(visualItem);
-                if ((MAV_CMD)simpleItem->command() == MAV_CMD_NAV_WAYPOINT) {
-                    foundAltitude = simpleItem->exitCoordinate().altitude();
-                    foundFrame = simpleItem->missionItem().frame();
+                if (simpleItem->specifiesAltitude()) {
+                    foundAltitude = simpleItem->altitude()->rawValue().toDouble();
+                    foundAltitudeMode = simpleItem->altitudeMode();
                     found = true;
                     break;
                 }
@@ -1676,7 +1696,7 @@ bool MissionController::_findPreviousAltitude(int newIndex, double* prevAltitude
 
     if (found) {
         *prevAltitude = foundAltitude;
-        *prevFrame = foundFrame;
+        *prevAltitudeMode = foundAltitudeMode;
     }
 
     return found;
