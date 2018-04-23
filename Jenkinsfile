@@ -3,22 +3,82 @@ pipeline {
   stages {
     stage('build') {
       parallel {
-        stage('Linux Release') {
+
+        stage('Android Release') {
+          environment {
+            CCACHE_BASEDIR = "${env.WORKSPACE}"
+            QGC_CONFIG = 'release'
+            QMAKE_VER = "5.9.2/android_armv7/bin/qmake"
+          }
           agent {
             docker {
-              image 'mavlink/qgc-build-linux'
-              args '-e CI=true -e CCACHE_BASEDIR=$WORKSPACE -e CCACHE_DIR=/tmp/ccache -v /tmp/ccache:/tmp/ccache:rw'
+              image 'mavlink/qgc-build-android:2018-04-14'
+              args '-v ${CCACHE_DIR}:${CCACHE_DIR}:rw'
             }
           }
           steps {
+            sh 'export'
+            sh 'ccache -z'
             sh 'git submodule deinit -f .'
             sh 'git clean -ff -x -d .'
             sh 'git submodule update --init --recursive --force'
-            sh 'mkdir build; cd build; qmake -r ${WORKSPACE}/qgroundcontrol.pro CONFIG+=release CONFIG+=WarningsAsErrorsOn'
-            sh 'cd build; make -j4'
+            sh 'mkdir build; cd build; ${QT_PATH}/${QMAKE_VER} -r ${WORKSPACE}/qgroundcontrol.pro CONFIG+=${QGC_CONFIG} CONFIG+=WarningsAsErrorsOn'
+            sh 'cd build; make -j`nproc --all`'
             sh 'ccache -s'
+            sh 'git clean -ff -x -d .'
           }
         }
+
+        stage('Linux Debug') {
+          environment {
+            CCACHE_BASEDIR = "${env.WORKSPACE}"
+            QGC_CONFIG = 'debug'
+            QMAKE_VER = "5.9.2/gcc_64/bin/qmake"
+          }
+          agent {
+            docker {
+              image 'mavlink/qgc-build-linux:2018-04-14'
+              args '-v ${CCACHE_DIR}:${CCACHE_DIR}:rw'
+            }
+          }
+          steps {
+            sh 'export'
+            sh 'ccache -z'
+            sh 'git submodule deinit -f .'
+            sh 'git clean -ff -x -d .'
+            sh 'git submodule update --init --recursive --force'
+            sh 'mkdir build; cd build; ${QT_PATH}/${QMAKE_VER} -r ${WORKSPACE}/qgroundcontrol.pro CONFIG+=${QGC_CONFIG} CONFIG+=WarningsAsErrorsOn'
+            sh 'cd build; make -j`nproc --all`'
+            sh 'ccache -s'
+            sh 'git clean -ff -x -d .'
+          }
+        }
+
+        stage('Linux Release') {
+          environment {
+            CCACHE_BASEDIR = "${env.WORKSPACE}"
+            QGC_CONFIG = 'release'
+            QMAKE_VER = "5.9.2/gcc_64/bin/qmake"
+          }
+          agent {
+            docker {
+              image 'mavlink/qgc-build-linux:2018-04-14'
+              args '-v ${CCACHE_DIR}:${CCACHE_DIR}:rw'
+            }
+          }
+          steps {
+            sh 'export'
+            sh 'ccache -z'
+            sh 'git submodule deinit -f .'
+            sh 'git clean -ff -x -d .'
+            sh 'git submodule update --init --recursive --force'
+            sh 'mkdir build; cd build; ${QT_PATH}/${QMAKE_VER} -r ${WORKSPACE}/qgroundcontrol.pro CONFIG+=${QGC_CONFIG} CONFIG+=WarningsAsErrorsOn'
+            sh 'cd build; make -j`nproc --all`'
+            sh 'ccache -s'
+            sh 'git clean -ff -x -d .'
+          }
+        }
+
         stage('OSX Debug') {
           agent {
             node {
@@ -26,19 +86,23 @@ pipeline {
             }
           }
           environment {
-            QT_FATAL_WARNINGS = '1'
-            QMAKESPEC = 'macx-clang'
+            CCACHE_BASEDIR = "${env.WORKSPACE}"
+            QGC_CONFIG = 'debug'
+            QMAKE_VER = "5.9.3/clang_64/bin/qmake"
           }
           steps {
+            sh 'export'
+            sh 'ccache -z'
             sh 'git submodule deinit -f .'
             sh 'git clean -ff -x -d .'
             sh 'git submodule update --init --recursive --force'
-            sh 'rm -rf ${SHADOW_BUILD_DIR}; mkdir -p ${SHADOW_BUILD_DIR}'
-            sh 'cd ${SHADOW_BUILD_DIR}; ${QT_PATH}/5.9.3/clang_64/bin/qmake -r ${WORKSPACE}/qgroundcontrol.pro CONFIG+=debug CONFIG+=WarningsAsErrorsOn'
-            sh 'cd ${SHADOW_BUILD_DIR}; make -j`sysctl -n hw.ncpu`'
+            sh 'mkdir build; cd build; ${QT_PATH}/${QMAKE_VER} -r ${WORKSPACE}/qgroundcontrol.pro CONFIG+=${QGC_CONFIG} CONFIG+=WarningsAsErrorsOn'
+            sh 'cd build; make -j`sysctl -n hw.ncpu`'
             sh 'ccache -s'
+            sh 'git clean -ff -x -d .'
           }
         }
+
         stage('OSX Release') {
           agent {
             node {
@@ -46,25 +110,37 @@ pipeline {
             }
           }
           environment {
-            QT_FATAL_WARNINGS = '1'
-            QMAKESPEC = 'macx-clang'
+            CCACHE_BASEDIR = "${env.WORKSPACE}"
+            QGC_CONFIG = 'installer'
+            QMAKE_VER = "5.9.3/clang_64/bin/qmake"
           }
           steps {
+            sh 'export'
+            sh 'ccache -z'
             sh 'git submodule deinit -f .'
             sh 'git clean -ff -x -d .'
             sh 'git submodule update --init --recursive --force'
-            sh 'rm -rf ${SHADOW_BUILD_DIR}; mkdir -p ${SHADOW_BUILD_DIR}'
-            sh 'cd ${SHADOW_BUILD_DIR}; ${QT_PATH}/5.9.3/clang_64/bin/qmake -r ${WORKSPACE}/qgroundcontrol.pro CONFIG+=release CONFIG+=WarningsAsErrorsOn'
-            sh 'cd ${SHADOW_BUILD_DIR}; make -j`sysctl -n hw.ncpu`'
+            sh 'mkdir build; cd build; ${QT_PATH}/${QMAKE_VER} -r ${WORKSPACE}/qgroundcontrol.pro CONFIG+=${QGC_CONFIG} CONFIG+=WarningsAsErrorsOn'
+            sh 'cd build; make -j`sysctl -n hw.ncpu`'
             sh 'ccache -s'
+            archiveArtifacts(artifacts: 'build/**/*.dmg', fingerprint: true, onlyIfSuccessful: true)
+            sh 'git clean -ff -x -d .'
           }
         }
+
       }
     }
   }
+
   environment {
-    SHADOW_BUILD_DIR = '/tmp/jenkins/shadow_build_dir'
     CCACHE_CPP2 = '1'
-    CCACHE_BASEDIR = '${WORKSPACE}'
+    CCACHE_DIR = '/tmp/ccache'
+    QT_FATAL_WARNINGS = '1'
   }
+
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '10', artifactDaysToKeepStr: '30'))
+    timeout(time: 60, unit: 'MINUTES')
+  }
+
 }

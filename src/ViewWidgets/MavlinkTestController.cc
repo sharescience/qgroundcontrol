@@ -384,7 +384,17 @@ MavlinkTestController::sendChannelsOverride(){
                                           _ch5Value,
                                           _ch6Value,
                                           _ch7Value,
-                                          _ch8Value);
+                                          _ch8Value,
+                                          _ch9Value,
+                                          _ch10Value,
+                                          _ch11Value,
+                                          _ch12Value,
+                                          _ch13Value,
+                                          _ch14Value,
+                                          _ch15Value,
+                                          _ch16Value,
+                                          _ch17Value,
+                                          _ch18Value);
     if(_vehicle){
         _vehicle->sendMessageOnLink(_vehicle->priorityLink(), msg);
     }
